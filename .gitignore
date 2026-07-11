@@ -13,3 +13,5 @@ apps/desktop/src-tauri/target/
 # TypeScript / Next.js generated artifacts
 *.tsbuildinfo
 next-env.d.ts
+# Local agent scratch (SDD progress ledger, review packages, task briefs)
+.superpowers/
