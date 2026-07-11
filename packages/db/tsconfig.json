@@ -1,0 +1,1 @@
+{ "extends": "@wedevs/config/tsconfig.base.json", "include": ["src"] }
