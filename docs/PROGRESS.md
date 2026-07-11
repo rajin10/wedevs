@@ -50,6 +50,10 @@ wedevs/
 ├─ pnpm-workspace.yaml     # workspaces: apps/*, packages/*  (+ approved native builds)
 ├─ turbo.json             # the 4 pipeline tasks + dev
 ├─ tsconfig.json          # root TS config (editor DX)
+├─ eslint.config.js       # root ESLint config (used by lint-staged)
+├─ commitlint.config.js · .lintstagedrc.json
+├─ .husky/                # pre-commit (lint-staged) + commit-msg (commitlint) hooks
+├─ .github/workflows/     # ci.yml — lint/typecheck/test/build on every PR
 ├─ .gitignore .npmrc .nvmrc
 ├─ apps/
 │  ├─ web/                # Next.js 15 + React 19 + Tailwind v4 app
@@ -67,7 +71,7 @@ wedevs/
 └─ prototype/             # earlier clickable prototype (unchanged)
 ```
 
-**Not yet created** (later Phase-0 tasks): git hooks (`.husky/`), the CI workflow (`.github/workflows/`). **Not yet created** (later phases): real feature code in `ui/ai/db/integrations`, the Tauri `apps/desktop/`, and the `docker/` deploy files.
+**Not yet created** (later phases): real feature code in `ui/ai/db/integrations`, the Tauri `apps/desktop/`, and the `docker/` deploy files (Dockerfile, `docker-compose.yml`, Caddyfile) — the deploy pipeline is set up in the GitHub phase (§7–§8).
 
 ---
 
