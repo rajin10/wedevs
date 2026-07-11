@@ -43,15 +43,15 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/wedevs-web:latest
             ghcr.io/${{ github.repository_owner }}/wedevs-web:${{ github.sha }}
 
-      - name: Copy compose files to the VPS
-        # Plain scp — reliable. (appleboy/scp-action + strip_components silently
-        # delivered nothing, leaving Caddy with no config to mount.)
+      - name: Copy compose file to the VPS
+        # Plain scp — reliable. Only the compose file is needed now; Caddy is
+        # configured via its reverse-proxy command (no Caddyfile to sync).
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key \
-            docker/docker-compose.yml docker/Caddyfile \
+            docker/docker-compose.yml \
             "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_APP_DIR }}/"
 
       - name: Deploy over SSH

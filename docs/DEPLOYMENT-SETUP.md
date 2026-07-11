@@ -26,10 +26,11 @@ get automatic HTTPS (one `.env` change, no rebuild — see "Switching to a domai
 
 Push/merge to `main` → CI gates (`lint / typecheck / test / build`) → the deploy
 job builds `ghcr.io/rajin10/wedevs-web:latest` + a `:<sha>` tag → copies
-`docker-compose.yml` + `Caddyfile` to `/opt/wedevs` → SSHes in, logs into GHCR
-with the workflow's own `GITHUB_TOKEN`, `docker compose pull && up -d` → Caddy
-serves the new version. The server's `/opt/wedevs/.env` is never overwritten, so
-server-specific settings persist across deploys.
+`docker-compose.yml` to `/opt/wedevs` → SSHes in, logs into GHCR with the
+workflow's own `GITHUB_TOKEN`, `docker compose pull && up -d` → Caddy (in
+`reverse-proxy` mode, configured by `SITE_ADDRESS`) serves the new version. The
+server's `/opt/wedevs/.env` is never overwritten, so server-specific settings
+persist across deploys.
 
 You can also run it on demand: **Actions → deploy → Run workflow**, or
 `gh workflow run deploy.yml --ref main`.
@@ -74,7 +75,7 @@ No image rebuild — the site address is read from env at container start.
 
 - Serving on a **bare IP must be HTTP**: Let's Encrypt cannot issue a certificate
   for an IP address, so `SITE_ADDRESS=:80` (plain HTTP) is correct until a domain
-  is attached. The env-driven Caddyfile flips to HTTPS the moment `SITE_ADDRESS`
+  is attached. The env-driven `reverse-proxy` flips to HTTPS the moment `SITE_ADDRESS`
   becomes a hostname.
 - No secrets live in the repo — the web app reads config through its validated
   env module; all deploy credentials live in GitHub Secrets / the server `.env`.
