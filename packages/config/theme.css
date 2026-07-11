@@ -1,0 +1,198 @@
+/* ============================================================
+   Wedevs canonical design tokens — Graphite × Volt.
+   SINGLE SOURCE OF TRUTH. Raw semantic vars (mockup names) live in
+   :root and flip per theme via BOTH prefers-color-scheme AND
+   [data-theme]; @theme inline maps them to Tailwind v4 utilities.
+   Ported from mockup/index.html :root 19-30 / @media 31-42 /
+   [data-theme="light"] 43-53 / [data-theme="dark"] 54-64.
+   Authoritative deviations (2026-07-12):
+     light --accent #5A9310 (was #4e8f12), --accent-text #ffffff
+     dark  --accent #9EFB25,               --accent-text #16200a
+     NEW   --sink code-surface (mockup left it undefined @619/621)
+   ============================================================ */
+
+/* ---- LIGHT (base) ---- */
+:root {
+  --bg: #f2f3ef;
+  --surface: #fdfdfb;
+  --surface-2: #f2f3ee;
+  --sidebar: #ecede6;
+  --elevated: #ffffff;
+  --sink: #e7e8e1;
+  --text: #21262a;
+  --text-2: #5b625c;
+  --text-3: #9aa096;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-2: rgba(0, 0, 0, 0.14);
+  --hover: rgba(0, 0, 0, 0.045);
+  --active: rgba(0, 0, 0, 0.06);
+  --active-line: rgba(0, 0, 0, 0.18);
+  --bubble: rgba(0, 0, 0, 0.05);
+  --primary: #21262a;
+  --primary-text: #fdfdfb;
+  --accent: #5a9310;
+  --accent-text: #ffffff;
+  --accent-soft: rgba(90, 147, 16, 0.12);
+  --accent-line: rgba(90, 147, 16, 0.5);
+  --success: #1f9d61;
+  --warning: #b7791f;
+  --error: #d6493d;
+  --shadow: 0 12px 40px rgba(30, 45, 15, 0.14);
+  --shadow-sm: 0 2px 8px rgba(30, 45, 15, 0.08);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+}
+/* ---- DARK (system preference) ---- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #252728;
+    --surface: #2c2f30;
+    --surface-2: #33373a;
+    --sidebar: #1b1d1e;
+    --elevated: #33373a;
+    --sink: #1c1e1f;
+    --text: #f2f4ee;
+    --text-2: #a6ada4;
+    --text-3: #6e756d;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-2: rgba(255, 255, 255, 0.14);
+    --hover: rgba(255, 255, 255, 0.05);
+    --active: rgba(255, 255, 255, 0.08);
+    --active-line: rgba(255, 255, 255, 0.18);
+    --bubble: rgba(255, 255, 255, 0.06);
+    --primary: #f2f4ee;
+    --primary-text: #1b1d1e;
+    --accent: #9efb25;
+    --accent-text: #16200a;
+    --accent-soft: rgba(158, 251, 37, 0.12);
+    --accent-line: rgba(158, 251, 37, 0.4);
+    --success: #5fe87b;
+    --warning: #e0a53d;
+    --error: #ff6b5e;
+    --shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-xs: 8px;
+  }
+}
+/* ---- EXPLICIT [data-theme] overrides (ThemeProvider stamps <html data-theme>; wins over @media) ---- */
+:root[data-theme="light"] {
+  --bg: #f2f3ef;
+  --surface: #fdfdfb;
+  --surface-2: #f2f3ee;
+  --sidebar: #ecede6;
+  --elevated: #ffffff;
+  --sink: #e7e8e1;
+  --text: #21262a;
+  --text-2: #5b625c;
+  --text-3: #9aa096;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-2: rgba(0, 0, 0, 0.14);
+  --hover: rgba(0, 0, 0, 0.045);
+  --active: rgba(0, 0, 0, 0.06);
+  --active-line: rgba(0, 0, 0, 0.18);
+  --bubble: rgba(0, 0, 0, 0.05);
+  --primary: #21262a;
+  --primary-text: #fdfdfb;
+  --accent: #5a9310;
+  --accent-text: #ffffff;
+  --accent-soft: rgba(90, 147, 16, 0.12);
+  --accent-line: rgba(90, 147, 16, 0.5);
+  --success: #1f9d61;
+  --warning: #b7791f;
+  --error: #d6493d;
+  --shadow: 0 12px 40px rgba(30, 45, 15, 0.14);
+  --shadow-sm: 0 2px 8px rgba(30, 45, 15, 0.08);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+}
+:root[data-theme="dark"] {
+  --bg: #252728;
+  --surface: #2c2f30;
+  --surface-2: #33373a;
+  --sidebar: #1b1d1e;
+  --elevated: #33373a;
+  --sink: #1c1e1f;
+  --text: #f2f4ee;
+  --text-2: #a6ada4;
+  --text-3: #6e756d;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.14);
+  --hover: rgba(255, 255, 255, 0.05);
+  --active: rgba(255, 255, 255, 0.08);
+  --active-line: rgba(255, 255, 255, 0.18);
+  --bubble: rgba(255, 255, 255, 0.06);
+  --primary: #f2f4ee;
+  --primary-text: #1b1d1e;
+  --accent: #9efb25;
+  --accent-text: #16200a;
+  --accent-soft: rgba(158, 251, 37, 0.12);
+  --accent-line: rgba(158, 251, 37, 0.4);
+  --success: #5fe87b;
+  --warning: #e0a53d;
+  --error: #ff6b5e;
+  --shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+}
+
+/* ---- global keyboard focus ring (ported from mockup index.html :focus-visible, ~line 85):
+        every native interactive element gets a visible Volt outline when focused via keyboard. ---- */
+:focus-visible {
+  outline: 2px solid var(--accent-line);
+  outline-offset: 2px;
+}
+
+/* ---- Tailwind v4 utility mapping. `inline` emits utilities that reference the raw
+        var directly (e.g. background-color:var(--bg)), so a runtime override of the
+        raw var flips the generated utility too. ---- */
+@theme inline {
+  /* surfaces */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-sidebar: var(--sidebar);
+  --color-elevated: var(--elevated);
+  --color-sink: var(--sink);
+  /* text */
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  /* lines + washes */
+  --color-border: var(--border);
+  --color-border-2: var(--border-2);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --color-active-line: var(--active-line);
+  --color-bubble: var(--bubble);
+  /* neutral interactive fills */
+  --color-primary: var(--primary);
+  --color-primary-text: var(--primary-text);
+  /* the one brand hue (Volt) — allowed only on alive/focus surfaces per brand rule */
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+  /* state */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  /* radii — NON-colliding Tailwind names so raw --radius-sm/--radius-xs stay intact:
+       rounded-xl = --radius (14px) · rounded-lg = --radius-sm (10px) · rounded-md = --radius-xs (8px) */
+  --radius-xl: var(--radius);
+  --radius-lg: var(--radius-sm);
+  --radius-md: var(--radius-xs);
+  /* shadows — non-colliding names: shadow-xl = --shadow · shadow-lg = --shadow-sm */
+  --shadow-xl: var(--shadow);
+  --shadow-lg: var(--shadow-sm);
+  /* fonts (mirrored in tailwind.preset.ts; raw --font-* provided by apps/web/fonts.ts) */
+  --font-display: var(--font-unbounded), "Unbounded", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
