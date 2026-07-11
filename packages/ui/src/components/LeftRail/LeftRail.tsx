@@ -317,8 +317,6 @@ export function LeftRail(props: LeftRailProps) {
                 ) : (
                   <div
                     key={chat.id}
-                    role="button"
-                    tabIndex={0}
                     data-recent={chat.id}
                     onDoubleClick={() => setRenamingId(chat.id)}
                     className={cn(navBase, "cursor-pointer")}
@@ -337,7 +335,6 @@ export function LeftRail(props: LeftRailProps) {
                           <button
                             type="button"
                             aria-label={`Chat options for ${chat.title}`}
-                            onClick={(e) => e.stopPropagation()}
                             className="ml-auto grid h-[22px] w-[22px] flex-none place-items-center rounded-md text-[var(--text-3)] opacity-0 transition-opacity hover:bg-[var(--active)] hover:text-[var(--text)] group-hover:opacity-100 focus-visible:opacity-100"
                           >
                             <DotsIcon />
@@ -387,12 +384,7 @@ export function LeftRail(props: LeftRailProps) {
                 <span>Projects</span>
               </div>
               {projects.map((p) => (
-                <div
-                  key={p.id}
-                  role="button"
-                  tabIndex={0}
-                  className={cn(navBase, "cursor-pointer")}
-                >
+                <div key={p.id} className={navBase}>
                   <span className="flex-none text-[var(--text-3)]">
                     <FolderIcon />
                   </span>
