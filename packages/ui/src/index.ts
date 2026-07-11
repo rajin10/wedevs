@@ -33,3 +33,19 @@ export {
   CommandItem as CommandRowItem,
   CommandShortcut,
 } from "./primitives/command";
+
+// mascots
+export { Robo } from "./mascots/Robo";
+export type { RoboProps } from "./mascots/Robo";
+export { Visor } from "./mascots/Visor";
+export type { VisorProps } from "./mascots/Visor";
+
+// live primitives
+export { LiveDot } from "./live/LiveDot";
+export type { LiveDotProps } from "./live/LiveDot";
+export { LiveCluster } from "./live/LiveCluster";
+export type { LiveClusterProps } from "./live/LiveCluster";
+export { StreamShimmer } from "./live/StreamShimmer";
+export type { StreamShimmerProps } from "./live/StreamShimmer";
+export { TypeCaret } from "./live/TypeCaret";
+export type { TypeCaretProps } from "./live/TypeCaret";

@@ -2,11 +2,22 @@
    Wedevs animation layer — custom keyframes + theme cross-fade.
    Ported from mockup/index.html: blinkeye(78) antp(80) bob(565)
    scan(567) hsh(571) mockglow(556-557) txtshim(578) twinkle(655)
-   caret(278). Consumed by mascots (Robo/Visor), live/* and
-   StreamShimmer. Downstream nickname->name: blink=blinkeye, shimmer=txtshim.
+   caret(278) live(285, backfilled for Task 6 — LiveDot/LiveCluster
+   presence pulse; not enumerated in the Task 2 summary but required
+   here). Consumed by mascots (Robo/Visor), live/* and StreamShimmer.
+   Downstream nickname->name: blink=blinkeye, shimmer=txtshim.
    Reduced-motion backstop mirrors the JS-level useReducedMotion gating.
    ============================================================ */
 
+@keyframes live {
+  0% {
+    box-shadow: 0 0 0 0 var(--accent-soft);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
 @keyframes bob {
   0%,
   100% {
