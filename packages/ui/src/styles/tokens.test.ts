@@ -49,7 +49,8 @@ const TOKENS = [
 /** Grab the flat declaration body of a token block (blocks contain no nested braces). */
 function block(re: RegExp, label: string): string {
   const m = css.match(re);
-  if (!m) throw new Error(`theme block not found: ${label}`);
+  if (!m || m[1] === undefined)
+    throw new Error(`theme block not found: ${label}`);
   return m[1];
 }
 
