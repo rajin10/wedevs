@@ -30,7 +30,7 @@ function mockMatchMedia(initialDark: boolean): MediaMockControl {
       listeners.delete(cb);
     },
     dispatchEvent: () => true,
-  } satisfies Partial<MediaQueryList> as unknown as MediaQueryList;
+  } as unknown as MediaQueryList;
 
   vi.stubGlobal(
     "matchMedia",
