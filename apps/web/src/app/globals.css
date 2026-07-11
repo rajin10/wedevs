@@ -3,6 +3,19 @@
 @import "tw-animate-css";
 @import "@wedevs/ui/styles/keyframes.css";
 
+/* Font-family utilities → self-hosted next/font variables.
+   `@theme inline` inlines these into the generated utilities and does NOT
+   re-emit `--font-*` into :root, so `var(--font-sans)` here resolves to the
+   html-scoped value set by next/font — no circular / colliding definition.
+   This block comes AFTER theme.css, so it supersedes any placeholder font
+   stacks Task 2 declared (later layer wins). */
+@theme inline {
+  --font-display: var(--font-display), var(--font-sans), "Manrope", sans-serif;
+  --font-sans:
+    var(--font-sans), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, Consolas, monospace;
+}
+
 @layer base {
   html {
     font-family: var(--font-sans);
@@ -10,5 +23,26 @@
   body {
     background-color: var(--bg);
     color: var(--text);
+    font-family:
+      var(--font-sans),
+      "Segoe UI",
+      system-ui,
+      -apple-system,
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+}
+
+/* Base typography — ported from mockup lines 69 / 73 / 74. Left unlayered (not
+   inside @layer base) so these mockup-native classnames always win over any
+   layered Tailwind utility, matching CSS's unlayered-beats-layered cascade rule. */
+.disp,
+.brand-name,
+.greet {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.01em;
+}
+.mono {
+  font-family: var(--font-mono), ui-monospace, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
 }

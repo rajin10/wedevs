@@ -1,12 +1,23 @@
 import "./globals.css";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "@wedevs/ui";
+import { fontDisplay, fontSans, fontMono } from "./fonts";
 
-export const metadata = { title: "Wedevs", description: "AI chat + code workspace" };
+export const metadata = {
+  title: "Wedevs",
+  description: "AI chat + code workspace",
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html
+      lang="en"
+      className={`${fontDisplay.variable} ${fontSans.variable} ${fontMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
