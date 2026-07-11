@@ -210,13 +210,16 @@ Decisions confirmed on 2026-07-12:
 
 ---
 
-## 8. What's next (immediate)
+## 8. GitHub & deployment — DONE (2026-07-12)
 
-Phase 0 is done and merge-approved. The remaining steps are the GitHub + deployment setup from §7:
+The repo and pipeline are live:
 
-1. Create the private `wedevs` repo (account `rajin10`) and push.
-2. Establish the `main` / `develop` / `testing` branch structure and open the PR flow.
-3. Add the **deploy** workflow (build → push image → SSH into the VPS → Docker Compose) alongside the existing CI workflow, and hand over the VPS **secrets checklist**.
-4. Merge Phase 0 into `main` through that flow.
+- **Repo:** private `github.com/rajin10/wedevs` (account `rajin10`).
+- **Branches:** `main` (production, has all of Phase 0), plus `develop` and `testing` created off it for future work. Per the chosen flow, no PRs were opened yet — the next feature starts the PR flow.
+- **CI:** `.github/workflows/ci.yml` runs on every PR and every push to `main`, and **passed green on the clean Ubuntu runner** (~1m42s) — confirming the `--frozen-lockfile` install + `allowBuilds` native builds work outside the dev machine.
+- **Deploy:** `.github/workflows/deploy.yml` + `apps/web/Dockerfile` + `docker/` (compose + Caddyfile) build the web image in Actions, push to GHCR, and deploy to the VPS over SSH. It is **dormant** (gated on the `DEPLOY_ENABLED` repo variable) and currently **skips cleanly** on each push — no server or secrets are wired yet.
+- **To go live:** follow [DEPLOYMENT-SETUP.md](DEPLOYMENT-SETUP.md) — provision a VPS, add five secrets + the `DEPLOY_ENABLED=true` variable, then a push to `main` deploys.
 
-**Then Phase 1** — the design system + Adaptive Canvas shell — begins, turning `mockup/index.html` into real components. Each subsequent phase gets its own section in this report as it lands.
+## 9. What's next
+
+**Phase 1** — the design system + Adaptive Canvas shell — turning `mockup/index.html` into real components. It will be authored as its own plan and executed the same task-by-task way, and will get its own section here as it lands.
