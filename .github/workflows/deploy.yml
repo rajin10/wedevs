@@ -1,0 +1,68 @@
+name: deploy
+
+# Builds the web image in CI, pushes it to GHCR, then deploys it to the VPS
+# over SSH via docker compose. DORMANT by default: the job only runs when the
+# repository variable DEPLOY_ENABLED is set to "true", so until the server +
+# secrets exist it is skipped (not failed). Also runnable on demand.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # Enable by setting repo variable DEPLOY_ENABLED=true (Settings → Secrets and variables → Actions → Variables).
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/wedevs-web:latest
+            ghcr.io/${{ github.repository_owner }}/wedevs-web:${{ github.sha }}
+
+      - name: Copy compose files to the VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker/docker-compose.yml,docker/Caddyfile"
+          target: ${{ secrets.VPS_APP_DIR }}
+          strip_components: 1
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd "${{ secrets.VPS_APP_DIR }}"
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

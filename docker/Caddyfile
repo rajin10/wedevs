@@ -1,0 +1,7 @@
+# Caddy reverse proxy with automatic HTTPS (Let's Encrypt).
+# $DOMAIN is provided by docker-compose from the VPS .env file.
+
+{$DOMAIN} {
+	encode gzip zstd
+	reverse_proxy web:3000
+}

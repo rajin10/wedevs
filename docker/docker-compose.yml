@@ -1,0 +1,36 @@
+# Production stack for the Wedevs VPS. Lives on the server next to a `.env`
+# file (see .env.example). The deploy workflow copies this file up, then runs
+# `docker compose pull && docker compose up -d`.
+#
+# Phase 0 ships the web app behind Caddy (automatic HTTPS). The worker + redis
+# services join here in Phase 5/7 when async jobs land.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+  web:
+    image: ghcr.io/${GHCR_OWNER}/wedevs-web:latest
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_APP_URL: https://${DOMAIN}
+      GIT_SHA: ${GIT_SHA:-prod}
+    expose:
+      - "3000"
+
+volumes:
+  caddy_data:
+  caddy_config:
