@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedevs — chat that feels alive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+<style>
+/* ============================================================
+   WEDEVS — design tokens · v2
+   PRINCIPLE:  Neutral = interactive   ·   Volt = alive
+   Volt (#9EFB25 / #5A9310) ignites ONLY on live things:
+   streaming, presence, mascot eyes, the logo dot. Never on
+   hover / active / primary — those are carried by neutrals.
+   ============================================================ */
+:root{
+  /* light = base fallback; dark applied via media + [data-theme] */
+  --bg:#F2F3EF; --raise:#FDFDFB; --sink:#E9EAE3; --sidebar:#ECEDE6; --elevated:#FFFFFF;
+  --chalk:#21262A; --mist:#5b625c; --ghost:#9aa096;
+  --hair:rgba(0,0,0,.09); --hair2:rgba(0,0,0,.14); --hover:rgba(0,0,0,.045);
+  --active:rgba(0,0,0,.06); --active-line:rgba(0,0,0,.16); --user-bubble:rgba(0,0,0,.05);
+  --primary:#21262A; --primary-ink:#FDFDFB; --primary-hi:#000000;
+  --volt:#4e8f12; --volt-ink:#ffffff; --volt-soft:rgba(78,143,18,.12);
+  --volt-line:rgba(78,143,18,.5); --volt-glow:rgba(78,143,18,.28);
+  --coral:#d6493d; --shadow:rgba(30,45,15,.12); --grid:rgba(0,0,0,.026); --amb-glow:rgba(90,147,16,.05); --amb-dark:rgba(0,0,0,.03);
+  --disc:radial-gradient(circle at 50% 32%,#34393b,#1d2021);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#252728; --raise:#2c2f30; --sink:#1c1e1f; --sidebar:#1b1d1e; --elevated:#33373a;
+    --chalk:#f2f4ee; --mist:#a6ada4; --ghost:#6e756d;
+    --hair:rgba(255,255,255,.08); --hair2:rgba(255,255,255,.14); --hover:rgba(255,255,255,.05);
+    --active:rgba(255,255,255,.08); --active-line:rgba(255,255,255,.18); --user-bubble:rgba(255,255,255,.06);
+    --primary:#f2f4ee; --primary-ink:#1b1d1e; --primary-hi:#ffffff;
+    --volt:#9efb25; --volt-ink:#16200a; --volt-soft:rgba(158,251,37,.12);
+    --volt-line:rgba(158,251,37,.4); --volt-glow:rgba(158,251,37,.3);
+    --coral:#ff6b5e; --shadow:rgba(0,0,0,.42); --grid:rgba(255,255,255,.024); --amb-glow:rgba(158,251,37,.04); --amb-dark:rgba(0,0,0,.34);
+    --disc:radial-gradient(circle at 50% 32%,#34393b,#1d2021);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F2F3EF; --raise:#FDFDFB; --sink:#E9EAE3; --sidebar:#ECEDE6; --elevated:#FFFFFF;
+  --chalk:#21262A; --mist:#5b625c; --ghost:#9aa096;
+  --hair:rgba(0,0,0,.09); --hair2:rgba(0,0,0,.14); --hover:rgba(0,0,0,.045);
+  --active:rgba(0,0,0,.06); --active-line:rgba(0,0,0,.16); --user-bubble:rgba(0,0,0,.05);
+  --primary:#21262A; --primary-ink:#FDFDFB; --primary-hi:#000000;
+  --volt:#4e8f12; --volt-ink:#ffffff; --volt-soft:rgba(78,143,18,.12);
+  --volt-line:rgba(78,143,18,.5); --volt-glow:rgba(78,143,18,.28);
+  --coral:#d6493d; --shadow:rgba(30,45,15,.12); --grid:rgba(0,0,0,.026); --amb-glow:rgba(90,147,16,.05); --amb-dark:rgba(0,0,0,.03);
+  --disc:radial-gradient(circle at 50% 32%,#34393b,#1d2021);
+}
+:root[data-theme="dark"]{
+  --bg:#252728; --raise:#2c2f30; --sink:#1c1e1f; --sidebar:#1b1d1e; --elevated:#33373a;
+  --chalk:#f2f4ee; --mist:#a6ada4; --ghost:#6e756d;
+  --hair:rgba(255,255,255,.08); --hair2:rgba(255,255,255,.14); --hover:rgba(255,255,255,.05);
+  --active:rgba(255,255,255,.08); --active-line:rgba(255,255,255,.18); --user-bubble:rgba(255,255,255,.06);
+  --primary:#f2f4ee; --primary-ink:#1b1d1e; --primary-hi:#ffffff;
+  --volt:#9efb25; --volt-ink:#16200a; --volt-soft:rgba(158,251,37,.12);
+  --volt-line:rgba(158,251,37,.4); --volt-glow:rgba(158,251,37,.3);
+  --coral:#ff6b5e; --shadow:rgba(0,0,0,.42); --grid:rgba(255,255,255,.024);
+  --disc:radial-gradient(circle at 50% 32%,#34393b,#1d2021);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Manrope','Segoe UI',system-ui,-apple-system,sans-serif;
+  font-size:15px; line-height:1.6; color:var(--chalk); background:var(--bg);
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+.disp{font-family:'Unbounded','Manrope','Segoe UI',sans-serif;font-weight:800;letter-spacing:-.01em}
+.mono{font-family:'JetBrains Mono','Cascadia Code',Consolas,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--volt);outline-offset:2px;border-radius:6px}
+::selection{background:var(--volt-glow)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--hair2);border-radius:20px;border:3px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--ghost)}
+
+/* eyebrow motif (from Studio v2): tiny volt dash + spaced uppercase */
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'Unbounded','Manrope',sans-serif;
+  font-weight:700;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--mist)}
+.eyebrow .dash{width:22px;height:2px;background:var(--volt);border-radius:2px;flex:0 0 auto}
+
+/* the one persistent brand spark: a live/presence dot */
+.livedot{width:6px;height:6px;border-radius:50%;background:var(--volt);flex:0 0 auto}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--volt);flex:0 0 auto;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--volt-glow)}50%{box-shadow:0 0 0 5px transparent}}
+
+/* ============================================================ SHELL */
+.app{display:flex;height:100vh;position:relative;isolation:isolate}
+/* full-dark ground with subtle depth — no grid lines */
+.app::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1100px 620px at 50% -8%, var(--amb-glow), transparent 60%),
+    radial-gradient(72% 55% at 50% 122%, var(--amb-dark), transparent 62%);
+}
+
+/* ============================================================ SIDEBAR */
+.sidebar{
+  width:264px;flex:0 0 auto;background:var(--sidebar);border-right:1px solid var(--hair);
+  display:flex;flex-direction:column;gap:12px;padding:14px 12px;transition:width .28s cubic-bezier(.4,0,.2,1);
+  position:relative;z-index:40;
+}
+.sidebar.collapsed{width:0;padding:14px 0;border-right:none;overflow:hidden}
+.sb-top{display:flex;align-items:center;gap:9px;padding:2px 4px}
+.wordmark{font-family:'Unbounded','Manrope',sans-serif;font-weight:800;font-size:15px;letter-spacing:.02em}
+.wordmark b{color:var(--volt)}
+.icon-btn{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--mist);flex:0 0 auto}
+.icon-btn:hover{background:var(--hover);color:var(--chalk)}
+.sb-top .icon-btn{margin-left:auto}
+
+/* PRIMARY button = neutral (chalk on dark / ink on light), not volt */
+.btn-new{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 0;border-radius:11px;
+  background:var(--primary);color:var(--primary-ink);font-weight:700;font-size:14px;
+  box-shadow:0 2px 10px var(--shadow);transition:.16s;
+}
+.btn-new:hover{background:var(--primary-hi)}
+
+.search{
+  display:flex;align-items:center;gap:9px;border:1px solid var(--hair);border-radius:10px;padding:9px 11px;
+  color:var(--ghost);background:var(--hover);font-size:13.5px;width:100%;text-align:left;
+}
+.search:hover{border-color:var(--hair2);color:var(--mist)}
+.search .kbd{margin-left:auto;font-size:10px;border:1px solid var(--hair);border-radius:5px;padding:1px 5px;color:var(--ghost)}
+
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:2px;margin:0 -4px;padding:0 4px}
+.sb-label{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ghost);font-weight:800;margin:14px 6px 6px}
+.sb-label .add{margin-left:auto;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;color:var(--ghost);transition:.14s}
+.sb-label .add svg{width:14px;height:14px}
+.sb-label .add:hover{background:var(--hover);color:var(--chalk)}
+/* premium icon system */
+.ico{display:inline-grid;place-items:center;flex:0 0 auto;color:currentColor}
+.ico svg,[data-icon] svg{width:18px;height:18px;display:block}
+.sb-item .ico{color:var(--ghost)}
+.sb-item:hover .ico,.sb-item.active .ico{color:var(--chalk)}
+.sb-more{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;color:var(--ghost);
+  opacity:0;flex:0 0 auto;margin:-2px -3px -2px 0;transition:opacity .14s,background .14s,color .14s}
+.sb-more svg{width:15px;height:15px}
+.sb-item:hover .sb-more{opacity:1}
+.sb-more:hover{background:var(--hair2);color:var(--chalk)}
+.sb-item{
+  display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;color:var(--mist);
+  font-size:13.5px;font-weight:500;width:100%;text-align:left;border:1px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sb-item:hover{background:var(--hover);color:var(--chalk)}
+.sb-item.active{background:var(--active);border-color:var(--active-line);color:var(--chalk);font-weight:700}
+.sb-item .tw{overflow:hidden;text-overflow:ellipsis}
+.sb-item.muted{color:var(--ghost)}
+.chev{font-size:11px;color:var(--ghost)}
+
+/* upgrade card */
+.upgrade{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:1px solid var(--hair);
+  border-radius:12px;padding:9px 11px;background:var(--hover);transition:.16s}
+.upgrade:hover{border-color:var(--hair2);background:var(--active)}
+.upgrade .ico{color:var(--chalk)}
+.upgrade .up-txt{min-width:0;line-height:1.25}
+.upgrade .up-txt b{font-size:12.5px;display:block;font-weight:700}
+.upgrade .up-txt span{font-size:10.5px;color:var(--ghost)}
+/* account footer */
+.account{display:flex;align-items:center;gap:10px;border-top:1px solid var(--hair);margin-top:8px;padding:12px 4px 2px;position:relative}
+.avatar{width:32px;height:32px;border-radius:9px;background:var(--elevated);border:1px solid var(--hair2);
+  display:grid;place-items:center;color:var(--chalk);font-weight:800;font-size:12.5px;flex:0 0 auto}
+.account .who{line-height:1.2;min-width:0;flex:1;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.account .who .nm{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.plan-badge{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mist);
+  border:1px solid var(--hair2);border-radius:5px;padding:0 5px;line-height:15px;flex:0 0 auto}
+.account .who .sub{font-size:11px;color:var(--ghost);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account .gear{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--ghost);flex:0 0 auto}
+.account .gear:hover{background:var(--hover);color:var(--chalk)}
+
+/* ============================================================ MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.topbar{
+  height:54px;flex:0 0 auto;border-bottom:1px solid var(--hair);display:flex;align-items:center;gap:12px;padding:0 16px;
+  backdrop-filter:blur(6px);
+}
+.hamb{display:grid}
+/* agent chip = NEUTRAL surface; the mascot's volt eyes are the only spark */
+.agent-chip{
+  display:flex;align-items:center;gap:8px;border:1px solid var(--hair2);border-radius:999px;padding:5px 10px 5px 6px;
+  background:var(--active);position:relative;transition:.16s;
+}
+.agent-chip:hover{border-color:var(--ghost)}
+.agent-chip .name{font-weight:700;font-size:13px}
+.chat-title{font-weight:600;color:var(--mist);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .spacer{margin-left:auto}
+
+/* mascot disc */
+.bot{display:inline-grid;place-items:center;border-radius:12px;background:var(--disc);flex:0 0 auto;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.bot svg{display:block}
+
+/* ============================================================ HOME */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.home{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:48px 24px 60px}
+.home .greet{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.home .greet h1{font-family:'Unbounded','Manrope',sans-serif;font-weight:800;font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;line-height:1.05;text-wrap:balance}
+.home .greet h1 b{color:var(--volt)}
+.home .greet .sub{color:var(--mist);font-weight:500;font-size:15px}
+.agent-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:min(680px,100%)}
+.agent-card{
+  position:relative;border:1px solid var(--hair);border-radius:16px;background:var(--raise);padding:16px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;transition:transform .18s, border-color .18s, box-shadow .18s;
+}
+.agent-card:hover{transform:translateY(-3px);border-color:var(--hair2);box-shadow:0 12px 30px var(--shadow)}
+.agent-card.sel{border-color:var(--active-line);box-shadow:0 0 0 3px var(--active)}
+.agent-card.sel .presence{opacity:1}
+.agent-card .presence{position:absolute;top:11px;right:11px;display:flex;align-items:center;gap:5px;opacity:0;
+  font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--volt);transition:opacity .2s}
+.agent-card b{font-size:14px}
+.agent-card span.role{font-size:11.5px;color:var(--mist);line-height:1.4}
+.home .recents{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:640px}
+.recent-chip{border:1px solid var(--hair);border-radius:999px;padding:6px 13px;font-size:12.5px;color:var(--mist);background:var(--raise)}
+.recent-chip:hover{border-color:var(--active-line);color:var(--chalk)}
+/* console-style live session pill (inspired by the Studio v2 "Choice" bar) */
+.session-pill{display:inline-flex;align-items:center;gap:2px;max-width:100%;overflow-x:auto;
+  background:var(--sink);border:1px solid var(--hair2);border-radius:999px;padding:6px 8px 6px 15px;
+  box-shadow:0 10px 30px var(--shadow),inset 0 1px 0 rgba(255,255,255,.045)}
+.session-pill::-webkit-scrollbar{display:none}
+.sp-label{color:var(--ghost);font-weight:800;font-size:10px;letter-spacing:.18em;margin-right:8px;flex:0 0 auto}
+.sp-seg{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;color:var(--mist);
+  font-size:12.5px;font-weight:600;white-space:nowrap;transition:.14s;flex:0 0 auto}
+.sp-seg:hover{background:var(--hover);color:var(--chalk)}
+.sp-seg .k{color:var(--ghost);font-weight:600}
+.sp-seg .v{color:var(--volt);font-weight:700}
+.sp-div{width:1px;height:15px;background:var(--hair);flex:0 0 auto}
+
+/* ============================================================ CONVERSATION */
+.thread{max-width:760px;margin:0 auto;padding:22px 24px 8px;display:flex;flex-direction:column;gap:16px}
+.daydiv{align-self:center;font-size:11px;color:var(--ghost);border:1px solid var(--hair);border-radius:999px;padding:3px 13px}
+.msg{display:flex;gap:12px;max-width:100%}
+.msg.user{align-self:flex-end;max-width:74%}
+.bubble-user{
+  padding:11px 15px;border-radius:16px 16px 5px 16px;background:var(--user-bubble);border:1px solid var(--hair);
+  font-weight:500;line-height:1.55;
+}
+.attach-pill{display:inline-flex;align-items:center;gap:5px;margin-top:7px;border:1px solid var(--hair);border-radius:7px;
+  padding:2px 8px;font-size:11px;background:var(--hover)}
+.msg.bot{align-self:flex-start;max-width:88%}
+.msg.bot .col{display:flex;flex-direction:column;gap:9px;min-width:0}
+.bubble-bot{
+  border:1px solid var(--hair);border-radius:5px 16px 16px 16px;background:var(--raise);padding:13px 16px;line-height:1.62;
+}
+.bubble-bot h4{font-size:14.5px;margin-bottom:4px}
+.bubble-bot p{margin:6px 0}
+.bubble-bot ol,.bubble-bot ul{margin:6px 0 6px 20px}
+.bubble-bot li{margin:3px 0;color:var(--mist)}
+.bubble-bot strong{color:var(--chalk);font-weight:700}
+.caret{display:inline-block;width:2px;height:1.05em;background:var(--volt);vertical-align:-2px;margin-left:1px;animation:blinkcaret .8s step-end infinite}
+@keyframes blinkcaret{50%{opacity:0}}
+
+.plugin-card{border:1px solid var(--hair);border-radius:13px;background:var(--sink);padding:11px 13px;display:flex;flex-direction:column;gap:7px}
+.plugin-head{display:flex;align-items:center;gap:8px}
+.plugin-head .tag{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mist);display:flex;align-items:center;gap:6px}
+.plugin-head .meta{font-size:11px;color:var(--ghost)}
+.plugin-body{font-size:12.5px;color:var(--mist);line-height:1.9;display:flex;flex-direction:column;gap:2px}
+.plugin-body a{color:var(--mist);text-decoration:none}
+.plugin-body a:hover{color:var(--chalk)}
+
+.streamline{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--ghost)}
+.streamline .stop{color:var(--chalk);cursor:pointer;font-weight:600}
+.streamline .stop:hover{color:var(--coral)}
+.thin{height:3px;border-radius:3px;background:var(--hair);overflow:hidden;flex:1;max-width:120px}
+.thin i{display:block;height:100%;width:40%;background:var(--volt);box-shadow:0 0 8px var(--volt-glow);animation:load 1.4s ease-in-out infinite}
+@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(320%)}}
+
+.msg-actions{display:flex;gap:4px;margin-top:2px;opacity:0;transition:opacity .15s}
+.msg.bot:hover .msg-actions{opacity:1}
+.act{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ghost)}
+.act:hover{background:var(--hover);color:var(--chalk)}
+
+/* ============================================================ COMPOSER (premium boxed toolbar) */
+.composer-wrap{flex:0 0 auto;padding:6px 24px 16px;background:linear-gradient(0deg,var(--bg) 60%,transparent)}
+.composer-inner{max-width:760px;margin:0 auto}
+.composer{
+  display:flex;flex-direction:column;gap:8px;border:1px solid var(--hair2);border-radius:24px;background:var(--sink);
+  padding:14px 14px 11px;box-shadow:0 16px 44px var(--shadow),inset 0 1px 0 rgba(255,255,255,.045);
+  transition:border-color .18s, box-shadow .18s;
+}
+.composer:focus-within{border-color:var(--ghost);box-shadow:0 18px 52px var(--shadow),inset 0 1px 0 rgba(255,255,255,.06)}
+textarea.ta{
+  width:100%;resize:none;border:none;background:none;color:var(--chalk);font-size:15px;line-height:1.55;
+  max-height:200px;min-height:26px;padding:6px 6px 2px;outline:none;font-family:inherit;
+}
+textarea.ta::placeholder{color:var(--ghost)}
+/* attachment chips */
+.attach-row{display:flex;flex-wrap:wrap;gap:8px;padding:2px 4px 4px}
+.attach-item{display:flex;align-items:center;gap:9px;border:1px solid var(--hair);border-radius:11px;padding:6px 8px 6px 6px;
+  background:var(--raise);font-size:12px;max-width:220px}
+.attach-item .thumb{width:28px;height:28px;border-radius:7px;background:var(--active);display:grid;place-items:center;color:var(--mist);flex:0 0 auto}
+.attach-item .thumb svg{width:15px;height:15px}
+.attach-item .meta{min-width:0;line-height:1.25}
+.attach-item .meta .nm{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.attach-item .meta .sz{font-size:10px;color:var(--ghost)}
+.attach-item .rm{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;color:var(--ghost);flex:0 0 auto}
+.attach-item .rm svg{width:13px;height:13px}
+.attach-item .rm:hover{background:var(--hair2);color:var(--chalk)}
+/* bottom toolbar inside the box */
+.ctoolbar{display:flex;align-items:center;gap:7px}
+.ctool-left{display:flex;align-items:center;gap:5px;min-width:0}
+.ctool-right{display:flex;align-items:center;gap:9px;margin-left:auto}
+.ctool{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--mist);border:1px solid transparent;flex:0 0 auto;transition:.14s}
+.ctool svg{width:19px;height:19px}
+.ctool:hover{background:var(--hover);color:var(--chalk)}
+.ctool.pill{width:auto;padding:0 12px;height:34px;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;border-color:var(--hair)}
+.ctool.pill svg{width:16px;height:16px}
+.ctool.pill:hover{border-color:var(--hair2)}
+.ctool.pill.on{background:var(--active);border-color:var(--active-line);color:var(--chalk)}
+.ctool.rec{color:var(--volt);border-color:var(--volt-line)}
+/* Claude-style agent switcher trigger (in composer) */
+.agent-switch{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 8px 0 6px;border-radius:11px;
+  border:1px solid var(--hair);background:var(--raise);color:var(--chalk);font-size:12.5px;font-weight:600;transition:.14s}
+.agent-switch:hover{border-color:var(--hair2);background:var(--elevated)}
+.agent-switch .bot{width:22px;height:20px;border-radius:6px}
+.chev{display:grid;place-items:center;color:var(--ghost)}
+.chev svg{width:13px;height:13px;display:block}
+.agent-switch .chev svg{width:14px;height:14px}
+/* active-tools indicator dot */
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--volt);display:none;margin-left:1px}
+.tdot.on{display:block}
+/* SEND = neutral primary; volt is reserved for "alive". Turns into a stop while streaming. */
+.send{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  background:var(--hair2);color:var(--mist);transition:.18s}
+.send svg{width:18px;height:18px}
+.send.ready{background:var(--primary);color:var(--primary-ink)}
+.send.ready:hover{background:var(--primary-hi)}
+.send.is-stop{background:var(--active);color:var(--chalk);border:1px solid var(--active-line)}
+.send.is-stop:hover{color:var(--coral);border-color:var(--coral)}
+.disclaimer{text-align:center;font-size:11px;color:var(--ghost);margin-top:10px}
+
+/* ============================================================ DROPDOWN / MENUS */
+.pop{position:absolute;z-index:80;background:var(--elevated);border:1px solid var(--hair2);border-radius:14px;
+  box-shadow:0 20px 50px var(--shadow);padding:6px;min-width:240px;animation:popin .16s cubic-bezier(.4,0,.2,1)}
+@keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
+.pop-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;width:100%;text-align:left;font-size:13.5px}
+.pop-item:hover{background:var(--hover)}
+.pop-item .pi-txt{min-width:0}
+.pop-item .pi-txt b{display:block;font-size:13px;font-weight:700}
+.pop-item .pi-txt span{font-size:11.5px;color:var(--ghost)}
+.pop-item .ico{color:var(--mist);flex:0 0 auto}
+.pop-item .ico svg{width:16px;height:16px}
+.pop-item.danger{color:var(--coral)}
+.pop-item.danger .ico{color:var(--coral)}
+.pop-sep{height:1px;background:var(--hair);margin:5px 8px}
+/* Claude-style agent picker menu */
+.apick{min-width:306px;padding:8px}
+.apick .lbl{padding:6px 10px 8px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ghost);font-weight:800}
+.arow{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:12px;width:100%;text-align:left;transition:.12s}
+.arow:hover{background:var(--hover)}
+.arow.sel{background:var(--active)}
+.arow .bot{width:38px;height:36px;border-radius:11px}
+.arow .atxt{flex:1;min-width:0}
+.arow .atxt b{font-size:14px;font-weight:700;display:block;line-height:1.3}
+.arow .atxt span{font-size:12px;color:var(--mist);display:block;line-height:1.35}
+.arow .chk{color:var(--chalk);opacity:0;flex:0 0 auto;display:grid;place-items:center}
+.arow .chk svg{width:18px;height:18px}
+.arow.sel .chk{opacity:1}
+.arow.foot .fic{width:38px;height:36px;border-radius:11px;background:var(--active);display:grid;place-items:center;color:var(--chalk);flex:0 0 auto}
+.arow.foot .fic svg{width:18px;height:18px}
+
+/* ============================================================ MODAL */
+.overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+  display:grid;place-items:center;padding:20px;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{background:var(--raise);border:1px solid var(--hair2);border-radius:20px;width:min(680px,100%);max-height:86vh;
+  overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);display:flex;flex-direction:column;animation:popin .2s}
+.modal-head{display:flex;align-items:center;gap:10px;padding:18px 20px;border-bottom:1px solid var(--hair)}
+.modal-head h3{font-size:17px;font-weight:800;font-family:'Unbounded','Manrope',sans-serif;letter-spacing:-.01em}
+.modal-head .icon-btn{margin-left:auto}
+.settings-body{display:flex;min-height:0;flex:1}
+.settings-nav{width:172px;flex:0 0 auto;border-right:1px solid var(--hair);padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+.set-tab{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;font-size:13.5px;color:var(--mist);text-align:left;width:100%}
+.set-tab:hover{background:var(--hover);color:var(--chalk)}
+.set-tab.active{background:var(--active);color:var(--chalk);font-weight:700}
+.settings-main{flex:1;padding:20px 22px;overflow-y:auto}
+.set-group{margin-bottom:26px}
+.set-group > .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ghost);font-weight:800;margin-bottom:12px}
+.set-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--hair)}
+.set-row:last-child{border-bottom:none}
+.set-row .desc{flex:1;min-width:0}
+.set-row .desc b{font-size:14px;font-weight:700;display:block}
+.set-row .desc span{font-size:12.5px;color:var(--mist)}
+.seg{display:inline-flex;border:1px solid var(--hair2);border-radius:10px;overflow:hidden;flex:0 0 auto}
+.seg button{padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--mist);border-right:1px solid var(--hair)}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--active);color:var(--chalk);font-weight:800}
+.seg button:hover:not(.on){background:var(--hover)}
+/* the toggle "on" state keeps volt — a genuine live/on signal */
+.switch{width:44px;height:25px;border-radius:20px;background:var(--hair2);position:relative;flex:0 0 auto;transition:.2s}
+.switch.on{background:var(--volt)}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on::after{left:22px}
+
+/* command palette */
+.cmd{width:min(560px,100%);background:var(--elevated);border:1px solid var(--hair2);border-radius:16px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);animation:popin .18s;align-self:flex-start;margin-top:12vh}
+.cmd input{width:100%;border:none;background:none;padding:16px 18px;font-size:16px;color:var(--chalk);outline:none;
+  border-bottom:1px solid var(--hair);font-family:inherit}
+.cmd input::placeholder{color:var(--ghost)}
+.cmd-list{max-height:340px;overflow-y:auto;padding:8px}
+.cmd-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;width:100%;text-align:left;font-size:14px;color:var(--chalk)}
+.cmd-item:hover,.cmd-item.hi{background:var(--hover)}
+.cmd-item .k{margin-left:auto;font-size:11px;color:var(--ghost)}
+.cmd-item .ci-ico{color:var(--mist);display:grid;place-items:center;width:20px}
+
+/* toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:200;background:var(--elevated);
+  border:1px solid var(--hair2);border-radius:11px;padding:10px 16px;font-size:13px;font-weight:600;
+  box-shadow:0 14px 36px rgba(0,0,0,.4);animation:toastin .25s}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,10px)}}
+
+.hidden{display:none!important}
+
+/* ============================================================ MASCOT ANIMS */
+.m-eye{transform-box:fill-box;transform-origin:center;animation:blink 4.8s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.m-ant{animation:antenna 1.9s ease-in-out infinite}
+@keyframes antenna{0%,100%{opacity:1}50%{opacity:.4}}
+.m-orbit{transform-box:fill-box;transform-origin:center;animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.m-scan{animation:scan 2.4s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:translateX(0)}50%{transform:translateX(13px)}}
+.bob{animation:bob 3.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.working .bob{animation-duration:1.5s}
+
+/* ============================================================ EXPRESSION LEVELS */
+.exp-calm .app::before{display:none}
+.exp-calm .bob,.exp-calm .dot-live,.exp-calm .m-orbit,.exp-calm .m-scan,.exp-calm .m-ant{animation:none}
+.exp-full .app::before{opacity:1.1}
+.exp-full .agent-card.sel{box-shadow:0 0 0 3px var(--active),0 0 30px var(--volt-glow)}
+.exp-full .btn-new{box-shadow:0 6px 18px var(--shadow)}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .app::before{animation:none}
+}
+
+/* ============================================================ RESPONSIVE */
+.scrim{display:none}
+@media (max-width:820px){
+  .sidebar{position:fixed;inset:0 auto 0 0;box-shadow:0 0 60px rgba(0,0,0,.5);transform:translateX(0)}
+  .sidebar.collapsed{width:264px;padding:14px 12px;transform:translateX(-100%);border-right:1px solid var(--hair)}
+  .hamb{display:grid}
+  .scrim.show{display:block;position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.5)}
+  .agent-grid{grid-template-columns:repeat(2,1fr)}
+  .chat-title{display:none}
+  .to-agent .nm2{display:none}
+  .thread,.composer-inner{max-width:100%}
+}
+</style>
+
+<div class="app" id="app">
+  <div class="scrim" id="scrim" onclick="toggleSidebar()"></div>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <span class="bot" style="width:30px;height:28px;border-radius:9px" id="brandBot"></span>
+      <span class="wordmark">WEDEVS<b>.</b></span>
+      <button class="icon-btn" title="Collapse sidebar" onclick="toggleSidebar()"><span class="ico" data-icon="panelLeft"></span></button>
+    </div>
+
+    <button class="btn-new" onclick="newChat()"><span class="ico" data-icon="pencil"></span> New chat</button>
+
+    <button class="search" onclick="openCmd()">
+      <span class="ico" data-icon="search"></span> Search chats
+      <span class="kbd mono">Ctrl K</span>
+    </button>
+
+    <div class="sb-scroll">
+      <div class="sb-label">Projects <button class="add" title="New project" onclick="toast('New project')" data-icon="plus"></button></div>
+      <div class="sb-item active" onclick="toast('Open project')">
+        <span class="ico" data-icon="folder"></span><span class="tw">Website redesign</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Website redesign')"></button></div>
+      <div class="sb-item" onclick="toast('Open project')">
+        <span class="ico" data-icon="folder"></span><span class="tw">Marketing content</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Marketing content')"></button></div>
+
+      <div class="sb-label">Today</div>
+      <div class="sb-item active" onclick="loadRecent('Blog outline for launch','writer')">
+        <span class="dot-live"></span><span class="tw">Blog outline for launch</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Blog outline for launch')"></button></div>
+      <div class="sb-item" onclick="loadRecent('Pricing page copy','writer')">
+        <span class="ico" data-icon="message"></span><span class="tw">Pricing page copy</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Pricing page copy')"></button></div>
+      <div class="sb-item" onclick="loadRecent('Logo feedback','buddy')">
+        <span class="ico" data-icon="message"></span><span class="tw">Logo feedback</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Logo feedback')"></button></div>
+
+      <div class="sb-label">Yesterday</div>
+      <div class="sb-item" onclick="loadRecent('Instagram captions','writer')">
+        <span class="ico" data-icon="message"></span><span class="tw">Instagram captions</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Instagram captions')"></button></div>
+      <div class="sb-item" onclick="loadRecent('Sales data breakdown','analyst')">
+        <span class="ico" data-icon="message"></span><span class="tw">Sales data breakdown</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Sales data breakdown')"></button></div>
+      <div class="sb-item" onclick="loadRecent('Fix my API loop','coder')">
+        <span class="ico" data-icon="message"></span><span class="tw">Fix my API loop</span>
+        <button class="sb-more" data-icon="more" onclick="openItemMenu(event,'Fix my API loop')"></button></div>
+    </div>
+
+    <button class="upgrade" onclick="toast('Upgrade to Pro — coming soon')">
+      <span class="ico" data-icon="sparkles"></span>
+      <span class="up-txt"><b>Upgrade to Pro</b><span>Unlimited chats &amp; agents</span></span>
+    </button>
+
+    <div class="account">
+      <div class="avatar">H</div>
+      <div class="who" onclick="toggleMenu('acctMenu',this)">
+        <span class="nm">Hasib <span class="plan-badge">Free</span></span>
+        <span class="sub">hasib.webdev@gmail.com</span>
+      </div>
+      <button class="gear" title="Settings" onclick="openSettings()" data-icon="settings"></button>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn hamb" title="Toggle sidebar" onclick="toggleSidebar()"><span class="ico" data-icon="panelLeft"></span></button>
+      <button class="agent-chip" id="agentChip" onclick="openAgentPicker(event)">
+        <span class="bot" id="chipBot" style="width:24px;height:22px;border-radius:7px"></span>
+        <span class="name" id="chipName">Writer</span>
+        <span class="chev" data-icon="chevDown"></span>
+      </button>
+      <span class="chat-title" id="chatTitle">New chat</span>
+      <span class="spacer"></span>
+      <button class="icon-btn" title="Share" onclick="toast('Share link copied')">&#8599;</button>
+      <button class="icon-btn" title="Theme" onclick="cycleTheme()" id="themeBtn">&#9681;</button>
+      <button class="icon-btn" title="Settings" onclick="openSettings()">&#9881;</button>
+    </header>
+
+    <div class="scroll" id="scroll">
+      <!-- HOME -->
+      <section class="home" id="home">
+        <div class="greet">
+          <div class="eyebrow"><span class="dash"></span> Your AI teammates</div>
+          <h1 id="greetLine">Good evening, Hasib<b>.</b></h1>
+          <div class="sub">Pick a teammate, or just start typing.</div>
+        </div>
+        <div class="composer-inner" style="width:min(600px,100%)">
+          <div class="composer">
+            <div class="attach-row hidden" id="attachRowHome"></div>
+            <textarea class="ta" id="homeInput" rows="1" placeholder="Ask anything…"></textarea>
+            <div class="ctoolbar">
+              <div class="ctool-left">
+                <button class="ctool" title="Attach files" onclick="openAttach(event)"><span class="ico" data-icon="plus"></span></button>
+                <button class="ctool pill" onclick="openTools(event)"><span class="ico" data-icon="sliders"></span> Tools <span class="tdot"></span></button>
+              </div>
+              <div class="ctool-right">
+                <button class="agent-switch" id="agentSwitchHome" onclick="openAgentPicker(event)"></button>
+                <button class="ctool" title="Voice input" onclick="toggleMic()"><span class="ico" data-icon="mic"></span></button>
+                <button class="send" id="homeSend" title="Send" onclick="sendFromHome()"><span class="ico" data-icon="arrowUp"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="session-pill" id="sessionPill">
+          <span class="sp-label mono">SESSION</span>
+          <button class="sp-seg" onclick="openAgentPicker(event)"><span class="k">Teammate —</span> <span class="v sp-agent">Writer</span></button>
+          <span class="sp-div"></span>
+          <button class="sp-seg" onclick="openTools(event)"><span class="k">Tools —</span> <span class="v sp-tools">Web search</span></button>
+          <span class="sp-div"></span>
+          <button class="sp-seg" onclick="openSettings()"><span class="k">Accent</span> <span class="v mono">#9EFB25</span></button>
+        </div>
+        <div class="agent-grid" id="agentGrid"></div>
+        <div class="recents">
+          <button class="recent-chip" onclick="loadRecent('Blog outline for launch','writer')">Blog outline for launch</button>
+          <button class="recent-chip" onclick="loadRecent('Sales data breakdown','analyst')">Sales data breakdown</button>
+          <button class="recent-chip" onclick="loadRecent('Fix my API loop','coder')">Fix my API loop</button>
+        </div>
+      </section>
+
+      <!-- THREAD -->
+      <section class="thread hidden" id="thread"></section>
+    </div>
+
+    <!-- COMPOSER (chat mode) -->
+    <div class="composer-wrap hidden" id="composerWrap">
+      <div class="composer-inner">
+        <div class="composer">
+          <div class="attach-row hidden" id="attachRow"></div>
+          <textarea class="ta" id="chatInput" rows="1" placeholder="Message Writer…"></textarea>
+          <div class="ctoolbar">
+            <div class="ctool-left">
+              <button class="ctool" id="attachBtn" title="Attach files" onclick="openAttach(event)"><span class="ico" data-icon="plus"></span></button>
+              <button class="ctool pill" id="toolsBtn" onclick="openTools(event)"><span class="ico" data-icon="sliders"></span> Tools <span class="tdot"></span></button>
+            </div>
+            <div class="ctool-right">
+              <button class="agent-switch" id="agentSwitch" onclick="openAgentPicker(event)"></button>
+              <button class="ctool" id="micBtn" title="Voice input" onclick="toggleMic()"><span class="ico" data-icon="mic"></span></button>
+              <button class="send" id="chatSend" title="Send" onclick="sendMessage()"><span class="ico" data-icon="arrowUp"></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="disclaimer">Wedevs can make mistakes — double-check important info.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================================ MASCOTS */
+const MASCOT = {
+  writer:(s)=>`<svg width="${s}" height="${s*0.94}" viewBox="0 0 64 60" fill="none">
+    <circle class="m-ant" cx="32" cy="6" r="3.4" fill="#9efb25"/><line x1="32" y1="9" x2="32" y2="15" stroke="#8b9384" stroke-width="2.4"/>
+    <rect x="14" y="15" width="36" height="29" rx="12" fill="#f2f4ee"/><rect x="20" y="23" width="24" height="13" rx="6.5" fill="#17191a"/>
+    <circle class="m-eye" cx="27.5" cy="29.5" r="2.7" fill="#9efb25"/><circle class="m-eye" cx="36.5" cy="29.5" r="2.7" fill="#9efb25"/></svg>`,
+  analyst:(s)=>`<svg width="${s}" height="${s*0.94}" viewBox="0 0 64 60" fill="none">
+    <ellipse class="m-orbit" cx="32" cy="32" rx="27" ry="10" stroke="rgba(158,251,37,.5)" stroke-width="1.4" stroke-dasharray="3 4"/>
+    <circle cx="32" cy="32" r="16" fill="#8ae62e"/><rect class="m-eye" x="26" y="27" width="4" height="8.5" rx="2" fill="#17191a"/>
+    <rect class="m-eye" x="34.5" y="27" width="4" height="8.5" rx="2" fill="#17191a"/></svg>`,
+  coder:(s)=>`<svg width="${s}" height="${s*0.94}" viewBox="0 0 64 60" fill="none">
+    <path d="M28 9 L36 9 L33 15 L31 15 Z" fill="#586066"/>
+    <rect x="12" y="15" width="40" height="31" rx="13" fill="#2c2f30" stroke="rgba(158,251,37,.4)"/>
+    <rect x="18" y="26" width="28" height="9" rx="4.5" fill="#0f1112"/><rect class="m-scan" x="20" y="28.3" width="7" height="4.4" rx="2" fill="#9efb25"/></svg>`,
+  buddy:(s)=>`<svg width="${s}" height="${s*0.94}" viewBox="0 0 64 60" fill="none">
+    <circle class="m-ant" cx="32" cy="5" r="2.9" fill="#9efb25"/><line x1="32" y1="7" x2="32" y2="13" stroke="#8b9384" stroke-width="2"/>
+    <rect x="17" y="13" width="30" height="43" rx="15" fill="#f2f4ee"/>
+    <circle class="m-eye" cx="27" cy="28" r="3" fill="#17191a"/><circle class="m-eye" cx="37" cy="28" r="3" fill="#17191a"/>
+    <path d="M28 35 Q32 38.5 36 35" stroke="#17191a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <circle cx="22.5" cy="32" r="2" fill="#c9e5a2"/><circle cx="41.5" cy="32" r="2" fill="#c9e5a2"/></svg>`
+};
+
+/* ============================================================ PREMIUM ICONS (Lucide-style, stroke) */
+const IC=(p)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICONS = {
+  panelLeft: IC('<rect width="18" height="18" x="3" y="3" rx="2.5"/><path d="M9 3v18"/>'),
+  pencil: IC('<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 15l-4 1 1-4Z"/>'),
+  search: IC('<circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3"/>'),
+  folder: IC('<path d="M4 20a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2Z"/>'),
+  message: IC('<path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2Z"/>'),
+  plus: IC('<path d="M12 5v14"/><path d="M5 12h14"/>'),
+  more: IC('<circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/><circle cx="5" cy="12" r="1.4"/>'),
+  settings: IC('<circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3 1a7.6 7.6 0 0 0-1.7-1l-.3-2.6h-4l-.3 2.6a7.6 7.6 0 0 0-1.7 1l-2.3-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7.6 7.6 0 0 0 1.7 1l.3 2.6h4l.3-2.6a7.6 7.6 0 0 0 1.7-1l2.3 1 2-3.4Z"/>'),
+  sparkles: IC('<path d="m12 3 1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3Z"/>'),
+  edit: IC('<path d="M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6"/><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 15l-4 1 1-4Z"/>'),
+  pin: IC('<path d="M12 17v5"/><path d="M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.3V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.7a2 2 0 0 0-1.1-1.8l-1.8-.9A2 2 0 0 1 15 10.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1Z"/>'),
+  trash: IC('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>'),
+  logout: IC('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>'),
+  zap: IC('<path d="M13 2 3 14h9l-1 8 10-12h-9Z"/>'),
+  globe: IC('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/>'),
+  mic: IC('<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v4"/>'),
+  arrowUp: IC('<path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>'),
+  sliders: IC('<path d="M4 21v-6"/><path d="M4 11V3"/><path d="M12 21v-8"/><path d="M12 9V3"/><path d="M20 21v-5"/><path d="M20 11V3"/><path d="M1 15h6"/><path d="M9 9h6"/><path d="M17 13h6"/>'),
+  image: IC('<rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-5-5L5 21"/>'),
+  file: IC('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>'),
+  stop: IC('<rect x="6" y="6" width="12" height="12" rx="2.5"/>'),
+  x: IC('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+  check: IC('<path d="M20 6 9 17l-5-5"/>'),
+  chevDown: IC('<path d="m6 9 6 6 6-6"/>')
+};
+function injectIcons(root){ (root||document).querySelectorAll('[data-icon]').forEach(el=>{ if(el.dataset.filled)return; el.innerHTML=ICONS[el.dataset.icon]||''; el.dataset.filled='1'; }); }
+
+const AGENTS = {
+  writer:{name:'Writer', tag:'Blogs, copy, captions', desc:'Blogs, copy & long-form writing'},
+  analyst:{name:'Analyst', tag:'Data, files, research', desc:'Data, spreadsheets & research'},
+  coder:{name:'Coder', tag:'Snippets, debugging', desc:'Code, snippets & debugging'},
+  buddy:{name:'Buddy', tag:'Everyday questions', desc:'Everyday help, fast & friendly'}
+};
+
+const REPLIES = {
+  writer:`<p>Here's a launch outline that positions you against both competitors — I'd lead with the <strong>"no hidden tiers"</strong> angle from your screenshot:</p>
+    <ol><li><strong>Hook</strong> — "Pricing shouldn't need a calculator"</li>
+    <li><strong>What changed &amp; why</strong> — show the new page visual</li>
+    <li><strong>Comparison table</strong> — you vs. Competitor A &amp; B, honest and specific</li>
+    <li><strong>Proof</strong> — one customer quote on the switch</li>
+    <li><strong>CTA</strong> — "See your price in 10 seconds"</li></ol>
+    <p>Want me to draft the full intro paragraph next?</p>`,
+  analyst:`<p>I read the file — <strong>Q2 revenue is up 18%</strong>, but the growth isn't even:</p>
+    <ul><li><strong>Enterprise</strong> drove 71% of new revenue (up from 54%)</li>
+    <li><strong>Self-serve</strong> flattened — churn ticked up 1.3pts</li>
+    <li>Your best week aligned with the pricing-page change on May 14</li></ul>
+    <p>The story worth telling leadership: enterprise is carrying you, and self-serve needs attention. Want a one-slide summary?</p>`,
+  coder:`<p>The loop never exits because you're mutating the array you're iterating. Pull the filter out first:</p>
+    <ul><li>Build the "to-remove" set in one pass</li>
+    <li>Then rebuild the array once, outside the loop</li>
+    <li>Bonus: this drops it from O(n²) to O(n)</li></ul>
+    <p>I can paste the exact patch for your language — is this JavaScript or Python?</p>`,
+  buddy:`<p>Totally — happy to help with that. Here's the quick version:</p>
+    <ul><li>Start with the one thing that unblocks everything else</li>
+    <li>Give yourself a 25-minute timer, no multitasking</li>
+    <li>Write down where you stopped, so tomorrow-you starts fast</li></ul>
+    <p>Want me to turn this into a simple checklist you can reuse?</p>`
+};
+
+/* ============================================================ STATE */
+const state={ agent:'writer', view:'home', web:true, exp:'balanced', theme:'dark', streaming:false, recording:false };
+
+function $(id){return document.getElementById(id)}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+/* ============================================================ INIT */
+function init(){
+  const t=localStorage.getItem('wd-theme'); if(t){state.theme=t}
+  applyTheme(state.theme);
+  const e=localStorage.getItem('wd-exp'); if(e){state.exp=e}
+  applyExp(state.exp);
+  renderBrand(); renderAgentGrid(); renderChip(); renderWebTool(); injectIcons();
+  wireInput($('chatInput'),$('chatSend'),sendMessage);
+  wireInput($('homeInput'),$('homeSend'),sendFromHome);
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCmd()}
+    if(e.key==='Escape'){closeAll()}
+  });
+  document.addEventListener('click',e=>{ if(!e.target.closest('.pop')&&!e.target.closest('[onclick^="toggleMenu"]')&&!e.target.closest('.account')&&!e.target.closest('.agent-chip')) closePops() });
+}
+function wireInput(ta,btn,onSend){
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,180)+'px';btn.classList.toggle('ready',ta.value.trim().length>0)});
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();onSend()}});
+}
+function renderBrand(){ $('brandBot').innerHTML=MASCOT.writer(22); }
+function renderChip(){ $('chipBot').innerHTML=MASCOT[state.agent](18); $('chipName').textContent=AGENTS[state.agent].name; $('chatInput').placeholder='Message '+AGENTS[state.agent].name+'…'; renderAgentSwitch(); renderSessionPill(); }
+function renderSessionPill(){
+  const a=document.querySelector('#sessionPill .sp-agent'); if(a)a.textContent=AGENTS[state.agent].name;
+  const t=document.querySelector('#sessionPill .sp-tools'); if(t)t.textContent=state.web?'Web search':'None';
+}
+function renderAgentSwitch(){
+  ['agentSwitch','agentSwitchHome'].forEach(id=>{ const el=$(id); if(!el)return;
+    el.innerHTML=`<span class="bot">${MASCOT[state.agent](16)}</span><span class="nm2">${AGENTS[state.agent].name}</span><span class="chev" data-icon="chevDown"></span>`;
+    el.title='Switch teammate — '+AGENTS[state.agent].name; injectIcons(el);
+  });
+}
+function renderWebTool(){ document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('on',state.web)); renderSessionPill(); }
+function renderAgentGrid(){
+  $('agentGrid').innerHTML=Object.entries(AGENTS).map(([id,a])=>`
+    <button class="agent-card ${id===state.agent?'sel':''}" onclick="pickAgent('${id}')">
+      <span class="presence"><span class="livedot"></span> active</span>
+      <span class="bot bob" style="width:52px;height:50px;border-radius:15px">${MASCOT[id](40)}</span>
+      <b>${a.name}</b><span class="role">${a.tag}</span>
+    </button>`).join('');
+  [...document.querySelectorAll('#agentGrid .bob')].forEach((el,i)=>el.style.animationDelay=(i*0.35)+'s');
+}
+
+/* ============================================================ THEME / EXP */
+function applyTheme(t){
+  state.theme=t;
+  if(t==='system'){document.documentElement.removeAttribute('data-theme')}
+  else{document.documentElement.setAttribute('data-theme',t)}
+  localStorage.setItem('wd-theme',t); syncSettingsUI();
+}
+function cycleTheme(){ const order=['dark','light','system']; applyTheme(order[(order.indexOf(state.theme)+1)%3]); toast('Theme: '+state.theme); }
+function applyExp(e){
+  state.exp=e; const app=$('app');
+  app.classList.remove('exp-calm','exp-balanced','exp-full');
+  app.classList.add('exp-'+e); localStorage.setItem('wd-exp',e); syncSettingsUI();
+}
+
+/* ============================================================ NAV */
+function toggleSidebar(){
+  const sb=$('sidebar'), sc=$('scrim');
+  sb.classList.toggle('collapsed');
+  sc.classList.toggle('show', !sb.classList.contains('collapsed') && window.innerWidth<=820);
+}
+function newChat(){
+  state.view='home'; $('thread').classList.add('hidden'); $('thread').innerHTML='';
+  $('composerWrap').classList.add('hidden'); $('home').classList.remove('hidden');
+  $('chatTitle').textContent='New chat'; renderAgentGrid();
+  if(window.innerWidth<=820&&!$('sidebar').classList.contains('collapsed'))toggleSidebar();
+}
+function pickAgent(id){ state.agent=id; renderChip(); renderAgentGrid(); }
+function selectAgentFromMenu(id){ state.agent=id; renderChip(); renderAgentGrid(); closePops();
+  if(state.view==='chat')toast('Switched to '+AGENTS[id].name); }
+
+function openAgentPicker(ev){ ev.stopPropagation();
+  const open=document.querySelector('.pop[data-k="agent"]'); closePops(); if(open)return;
+  const anchor=ev.currentTarget;
+  const pop=document.createElement('div'); pop.className='pop apick'; pop.dataset.k='agent';
+  pop.innerHTML=`<div class="lbl">Your teammates</div>`+
+    Object.entries(AGENTS).map(([id,a])=>`
+      <button class="arow ${id===state.agent?'sel':''}" onclick="selectAgentFromMenu('${id}')">
+        <span class="bot">${MASCOT[id](30)}</span>
+        <span class="atxt"><b>${a.name}</b><span>${a.desc}</span></span>
+        <span class="chk" data-icon="check"></span>
+      </button>`).join('')+
+    `<div class="pop-sep"></div>
+     <button class="arow foot" onclick="openSettings();closePops()">
+        <span class="fic" data-icon="sparkles"></span>
+        <span class="atxt"><b>Create custom agent</b><span>Your own persona, tools &amp; style</span></span></button>`;
+  const r=anchor.getBoundingClientRect();
+  pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-322))+'px';
+  if(r.top>window.innerHeight/2){ pop.style.bottom=(window.innerHeight-r.top+8)+'px'; }
+  else { pop.style.top=(r.bottom+8)+'px'; }
+  document.body.appendChild(pop); injectIcons(pop);
+}
+
+function enterChat(title){
+  state.view='chat'; $('home').classList.add('hidden');
+  $('thread').classList.remove('hidden'); $('composerWrap').classList.remove('hidden');
+  $('chatTitle').textContent=title||'New chat';
+}
+
+/* ============================================================ MESSAGING */
+function sendFromHome(){
+  const v=$('homeInput').value.trim(); if(!v)return;
+  enterChat(v.length>42?v.slice(0,42)+'…':v);
+  $('thread').innerHTML=`<div class="daydiv mono">today · now</div>`;
+  $('homeInput').value=''; $('homeInput').style.height='auto'; $('homeSend').classList.remove('ready');
+  addUser(v); stream(); $('chatInput').focus();
+}
+function sendMessage(){
+  if(state.streaming)return;
+  const ta=$('chatInput'), v=ta.value.trim(); if(!v)return;
+  if(state.view!=='chat')enterChat(v.slice(0,42));
+  ta.value=''; ta.style.height='auto'; $('chatSend').classList.remove('ready');
+  addUser(v); stream();
+}
+/* ---- attachments ---- */
+let attachments=[];
+function addAttach(kind,name,size){ attachments.push({kind,name,size}); renderAttach(); }
+function removeAttach(i){ attachments.splice(i,1); renderAttach(); }
+function renderAttach(){
+  const html=attachments.map((a,i)=>`
+    <div class="attach-item">
+      <span class="thumb"><span class="ico" data-icon="${a.kind==='image'?'image':'file'}"></span></span>
+      <span class="meta"><span class="nm">${esc(a.name)}</span><span class="sz">${a.size||''}</span></span>
+      <button class="rm" title="Remove" onclick="removeAttach(${i})"><span class="ico" data-icon="x"></span></button>
+    </div>`).join('');
+  document.querySelectorAll('.attach-row').forEach(row=>{ row.innerHTML=html; row.classList.toggle('hidden',attachments.length===0); injectIcons(row); });
+}
+function posAbove(pop,anchor){ const r=anchor.getBoundingClientRect();
+  pop.style.left=Math.min(r.left,window.innerWidth-252)+'px'; pop.style.bottom=(window.innerHeight-r.top+8)+'px'; }
+function openAttach(ev){ ev.stopPropagation(); closePops();
+  const pop=document.createElement('div'); pop.className='pop'; pop.dataset.k='attach'; pop.style.minWidth='214px';
+  pop.innerHTML=`
+    <button class="pop-item" onclick="addAttach('image','screenshot.png','PNG · 248 KB');closePops()"><span class="ico" data-icon="image"></span><span class="pi-txt"><b>Upload photo</b></span></button>
+    <button class="pop-item" onclick="addAttach('file','requirements.pdf','PDF · 1.2 MB');closePops()"><span class="ico" data-icon="file"></span><span class="pi-txt"><b>Upload file</b></span></button>
+    <div class="pop-sep"></div>
+    <button class="pop-item" onclick="toast('Connect an app');closePops()"><span class="ico" data-icon="folder"></span><span class="pi-txt"><b>Connect an app</b></span></button>`;
+  posAbove(pop,ev.currentTarget); document.body.appendChild(pop); injectIcons(pop);
+}
+function openTools(ev){ ev.stopPropagation(); closePops();
+  const pop=document.createElement('div'); pop.className='pop'; pop.dataset.k='tools'; pop.style.minWidth='232px';
+  pop.innerHTML=`
+    <div style="padding:6px 10px 4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ghost);font-weight:800">Plugins</div>
+    <button class="pop-item" onclick="toggleWeb();closePops()"><span class="ico" data-icon="globe"></span><span class="pi-txt"><b>Web search</b><span>${state.web?'On':'Off'}</span></span></button>
+    <button class="pop-item" onclick="toast('Image generation enabled');closePops()"><span class="ico" data-icon="image"></span><span class="pi-txt"><b>Image generation</b></span></button>
+    <button class="pop-item" onclick="toast('Code runner enabled');closePops()"><span class="ico" data-icon="sliders"></span><span class="pi-txt"><b>Code runner</b></span></button>
+    <div class="pop-sep"></div>
+    <button class="pop-item" onclick="openSettings();closePops()"><span class="ico" data-icon="settings"></span><span class="pi-txt"><b>Manage integrations</b></span></button>`;
+  posAbove(pop,ev.currentTarget); document.body.appendChild(pop); injectIcons(pop);
+}
+function setStreamingUI(on){
+  const btn=$('chatSend'); if(!btn)return;
+  btn.classList.toggle('is-stop',on);
+  btn.innerHTML=`<span class="ico" data-icon="${on?'stop':'arrowUp'}"></span>`; injectIcons(btn);
+  btn.onclick = on ? stopStream : sendMessage; btn.title = on ? 'Stop' : 'Send';
+}
+
+function addUser(text){
+  const el=document.createElement('div'); el.className='msg user';
+  const pills=attachments.map(a=>`<span class="attach-pill mono">&#128206; ${esc(a.name)}</span>`).join('');
+  el.innerHTML=`<div class="bubble-user">${esc(text)}${pills}</div>`;
+  $('thread').appendChild(el); attachments=[]; renderAttach(); scrollDown();
+}
+
+function stream(){
+  state.streaming=true; $('app').classList.add('working'); setStreamingUI(true);
+  const agent=state.agent;
+  const wrap=document.createElement('div'); wrap.className='msg bot';
+  const showPlugin = state.web && agent!=='buddy';
+  wrap.innerHTML=`
+    <span class="bot bob" style="width:34px;height:33px;border-radius:11px">${MASCOT[agent](28)}</span>
+    <div class="col">
+      ${showPlugin?`<div class="plugin-card"><div class="plugin-head">
+        <span class="tag"><span class="dot-live"></span> Web search</span><span class="meta mono">plugin · 3 results</span></div>
+        <div class="plugin-body mono">
+          <a href="#">&#9656; competitor-a.com/blog — "Simple pricing, finally"</a>
+          <a href="#">&#9656; competitor-b.io/changelog — tiered plans launch</a>
+          <a href="#">&#9656; saaspricing.dev — 2026 pricing patterns</a></div></div>`:''}
+      <div class="bubble-bot"><span class="body"></span><span class="caret"></span></div>
+      <div class="streamline mono"><span class="dot-live"></span> ${AGENTS[agent].name} is writing
+        <span class="stop" onclick="stopStream()">&#9632; stop</span> · <span class="tok">0</span> tokens
+        <span class="thin"><i></i></span></div>
+    </div>`;
+  $('thread').appendChild(wrap); scrollDown();
+
+  const body=wrap.querySelector('.body'), caret=wrap.querySelector('.caret'),
+        tok=wrap.querySelector('.tok'), line=wrap.querySelector('.streamline');
+  const html=REPLIES[agent]; const tokens=html.split(/(<[^>]+>|\s+)/).filter(Boolean);
+  let i=0, count=0;
+  const delay = showPlugin?520:120;
+  state._timer=setTimeout(function tick(){
+    if(!state.streaming)return;
+    if(i>=tokens.length){ finishStream(wrap,caret,line); return; }
+    body.innerHTML+=tokens[i]; i++; count+=6+Math.floor(Math.random()*8);
+    tok.textContent=count.toLocaleString();
+    if(i%3===0)scrollDown();
+    state._timer=setTimeout(tick, 14+Math.random()*40);
+  }, delay);
+}
+function finishStream(wrap,caret,line){
+  state.streaming=false; $('app').classList.remove('working'); setStreamingUI(false);
+  caret.remove(); line.remove();
+  const act=document.createElement('div'); act.className='msg-actions';
+  act.innerHTML=`<button class="act" title="Copy" onclick="toast('Copied')">&#10697;</button>
+    <button class="act" title="Retry" onclick="toast('Regenerating…')">&#8635;</button>
+    <button class="act" title="Good" onclick="toast('Thanks for the feedback')">&#128077;</button>
+    <button class="act" title="Bad" onclick="toast('Thanks for the feedback')">&#128078;</button>`;
+  wrap.querySelector('.col').appendChild(act); scrollDown();
+}
+function stopStream(){ if(!state.streaming)return; state.streaming=false; $('app').classList.remove('working'); setStreamingUI(false);
+  clearTimeout(state._timer);
+  const last=$('thread').querySelector('.msg.bot:last-child');
+  if(last){const c=last.querySelector('.caret'); if(c)c.remove(); const l=last.querySelector('.streamline'); if(l)l.remove();}
+  toast('Stopped');
+}
+function scrollDown(){ const s=$('scroll'); s.scrollTop=s.scrollHeight; }
+
+function loadRecent(title,agent){
+  state.agent=agent; renderChip(); enterChat(title);
+  const seed={
+    'Blog outline for launch':'Write a launch blog outline for our new pricing page. Check what competitors published recently.',
+    'Pricing page copy':'Draft the hero copy for our pricing page — friendly but confident.',
+    'Logo feedback':'What do you think of this logo direction? Too playful?',
+    'Instagram captions':'Give me 5 caption options for our product launch post.',
+    'Sales data breakdown':'Break down this quarter\'s sales file — what\'s the story?',
+    'Fix my API loop':'My fetch loop never finishes and the tab freezes. What\'s wrong?'
+  }[title]||title;
+  $('thread').innerHTML=`<div class="daydiv mono">earlier today</div>`;
+  addUser(seed); stream();
+  if(window.innerWidth<=820&&!$('sidebar').classList.contains('collapsed'))toggleSidebar();
+}
+
+/* ============================================================ TOOLS / MIC */
+function toggleWeb(){ state.web=!state.web; renderWebTool(); }
+function toggleMic(){
+  state.recording=!state.recording; $('micBtn').classList.toggle('rec',state.recording);
+  toast(state.recording?'Listening…':'Stopped listening');
+  if(!state.recording&&state.view==='chat'){ setTimeout(()=>{ $('chatInput').value='Summarize this in three bullet points';
+    $('chatInput').dispatchEvent(new Event('input')); },300); }
+}
+
+/* ============================================================ MENUS / POPS */
+function closePops(){ [...document.querySelectorAll('.pop')].forEach(p=>p.remove()); }
+function toggleMenu(kind,anchor){
+  const existing=document.querySelector('.pop[data-k="'+kind+'"]'); closePops(); if(existing)return;
+  const pop=document.createElement('div'); pop.className='pop'; pop.dataset.k=kind;
+  if(kind==='agentMenu'){
+    pop.innerHTML=Object.entries(AGENTS).map(([id,a])=>`
+      <button class="pop-item" onclick="selectAgentFromMenu('${id}')">
+        <span class="bot" style="width:30px;height:28px;border-radius:9px">${MASCOT[id](24)}</span>
+        <span class="pi-txt"><b>${a.name}</b><span>${a.tag}</span></span>
+        ${id===state.agent?'<span style="margin-left:auto;color:var(--mist)">&#10003;</span>':''}
+      </button>`).join('')+`<div class="pop-sep"></div>
+      <button class="pop-item" onclick="openSettings();closePops()"><span class="ico" data-icon="settings"></span><span class="pi-txt"><b>Manage agents</b></span></button>`;
+    const r=anchor.getBoundingClientRect(); pop.style.top=(r.bottom+6)+'px'; pop.style.left=r.left+'px';
+  }else if(kind==='acctMenu'){
+    pop.innerHTML=`
+      <button class="pop-item" onclick="openSettings();closePops()"><span class="ico" data-icon="settings"></span><span class="pi-txt"><b>Settings</b></span></button>
+      <button class="pop-item" onclick="cycleTheme();closePops()"><span class="ico" data-icon="sparkles"></span><span class="pi-txt"><b>Theme</b><span>Currently: ${state.theme}</span></span></button>
+      <button class="pop-item" onclick="toast('Upgrade coming soon');closePops()"><span class="ico" data-icon="zap"></span><span class="pi-txt"><b>Upgrade plan</b></span></button>
+      <div class="pop-sep"></div>
+      <button class="pop-item" onclick="toast('Signed out');closePops()"><span class="ico" data-icon="logout"></span><span class="pi-txt"><b>Sign out</b></span></button>`;
+    const r=anchor.getBoundingClientRect(); pop.style.left=(r.left)+'px'; pop.style.bottom=(window.innerHeight-r.top+8)+'px'; pop.style.minWidth='230px';
+  }
+  document.body.appendChild(pop); injectIcons(pop);
+}
+
+function openItemMenu(ev,title){
+  ev.stopPropagation(); closePops();
+  const pop=document.createElement('div'); pop.className='pop'; pop.dataset.k='item'; pop.style.minWidth='188px';
+  pop.innerHTML=`
+    <button class="pop-item" onclick="toast('Rename: ${title}');closePops()"><span class="ico" data-icon="edit"></span><span class="pi-txt"><b>Rename</b></span></button>
+    <button class="pop-item" onclick="toast('Pinned to top');closePops()"><span class="ico" data-icon="pin"></span><span class="pi-txt"><b>Pin to top</b></span></button>
+    <div class="pop-sep"></div>
+    <button class="pop-item danger" onclick="toast('Deleted');closePops()"><span class="ico" data-icon="trash"></span><span class="pi-txt"><b>Delete</b></span></button>`;
+  const r=ev.currentTarget.getBoundingClientRect();
+  pop.style.top=(r.bottom+6)+'px'; pop.style.left=Math.min(r.left-150,window.innerWidth-206)+'px';
+  document.body.appendChild(pop); injectIcons(pop);
+}
+
+/* ============================================================ COMMAND PALETTE */
+const CMD_ITEMS=[
+  {t:'New chat',i:'&#43;',act:()=>{newChat()}},
+  {t:'Blog outline for launch',i:'&#128172;',act:()=>loadRecent('Blog outline for launch','writer')},
+  {t:'Sales data breakdown',i:'&#128172;',act:()=>loadRecent('Sales data breakdown','analyst')},
+  {t:'Fix my API loop',i:'&#128172;',act:()=>loadRecent('Fix my API loop','coder')},
+  {t:'Switch to Writer',i:'&#9997;',act:()=>selectAgentFromMenu('writer')},
+  {t:'Switch to Analyst',i:'&#128202;',act:()=>selectAgentFromMenu('analyst')},
+  {t:'Switch to Coder',i:'&#128187;',act:()=>selectAgentFromMenu('coder')},
+  {t:'Open settings',i:'&#9881;',act:()=>openSettings()},
+  {t:'Toggle theme',i:'&#9681;',act:()=>cycleTheme()}
+];
+function openCmd(){
+  closeAll();
+  const ov=document.createElement('div'); ov.className='overlay'; ov.id='cmdOverlay'; ov.style.alignItems='flex-start';
+  ov.onclick=e=>{if(e.target===ov)closeAll()};
+  ov.innerHTML=`<div class="cmd"><input id="cmdInput" placeholder="Search chats and actions…" autocomplete="off"/><div class="cmd-list" id="cmdList"></div></div>`;
+  document.body.appendChild(ov);
+  const input=$('cmdInput'); renderCmd(''); input.focus();
+  input.addEventListener('input',()=>renderCmd(input.value));
+}
+function renderCmd(q){
+  const list=$('cmdList'); const items=CMD_ITEMS.filter(c=>c.t.toLowerCase().includes(q.toLowerCase()));
+  list.innerHTML=items.map((c,idx)=>`<button class="cmd-item ${idx===0?'hi':''}" data-idx="${idx}"><span class="ci-ico">${c.i}</span> ${c.t}${idx===0?'<span class="k mono">&#8629;</span>':''}</button>`).join('')||`<div style="padding:16px;color:var(--ghost);font-size:13px">No matches</div>`;
+  [...list.children].forEach((el,idx)=>el.onclick=()=>{closeAll();items[idx].act()});
+  const inp=$('cmdInput'); inp.onkeydown=e=>{if(e.key==='Enter'&&items[0]){closeAll();items[0].act()}};
+}
+
+/* ============================================================ SETTINGS */
+function openSettings(){
+  closeAll();
+  const ov=document.createElement('div'); ov.className='overlay'; ov.id='setOverlay';
+  ov.onclick=e=>{if(e.target===ov)closeAll()};
+  ov.innerHTML=`<div class="modal">
+    <div class="modal-head"><h3>Settings</h3><button class="icon-btn" onclick="closeAll()">&#10005;</button></div>
+    <div class="settings-body">
+      <nav class="settings-nav">
+        <button class="set-tab active">&#9673; Appearance</button>
+        <button class="set-tab">&#9997; Agents</button>
+        <button class="set-tab">&#128268; Integrations</button>
+        <button class="set-tab">&#128100; Account</button>
+      </nav>
+      <div class="settings-main">
+        <div class="set-group">
+          <div class="lbl">Theme</div>
+          <div class="set-row"><div class="desc"><b>Color theme</b><span>Dark is the brand's home. Light is fully supported.</span></div>
+            <div class="seg" id="segTheme">
+              <button data-v="dark" onclick="applyTheme('dark')">Dark</button>
+              <button data-v="light" onclick="applyTheme('light')">Light</button>
+              <button data-v="system" onclick="applyTheme('system')">System</button></div></div>
+        </div>
+        <div class="set-group">
+          <div class="lbl">Brand energy</div>
+          <div class="set-row"><div class="desc"><b>Expression level</b><span>How much volt "life" you see. Balanced keeps it rare &amp; earned.</span></div>
+            <div class="seg" id="segExp">
+              <button data-v="calm" onclick="applyExp('calm')">Calm</button>
+              <button data-v="balanced" onclick="applyExp('balanced')">Balanced</button>
+              <button data-v="full" onclick="applyExp('full')">Full Volt</button></div></div>
+        </div>
+        <div class="set-group">
+          <div class="lbl">Chat</div>
+          <div class="set-row"><div class="desc"><b>Web search plugin</b><span>Let agents look things up while answering.</span></div>
+            <div class="switch ${state.web?'on':''}" id="swWeb" onclick="toggleWebSetting(this)"></div></div>
+          <div class="set-row"><div class="desc"><b>Voice input</b><span>Dictate messages with your microphone.</span></div>
+            <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="set-row"><div class="desc"><b>Send on Enter</b><span>Enter sends · Shift+Enter makes a new line.</span></div>
+            <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+    </div></div>`;
+  document.body.appendChild(ov);
+  syncSettingsUI();
+  [...ov.querySelectorAll('.set-tab')].forEach(t=>t.onclick=()=>{ov.querySelectorAll('.set-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active')});
+}
+function toggleWebSetting(el){ state.web=!state.web; el.classList.toggle('on',state.web); renderWebTool(); }
+function syncSettingsUI(){
+  const st=document.getElementById('segTheme'); if(st)[...st.children].forEach(b=>b.classList.toggle('on',b.dataset.v===state.theme));
+  const se=document.getElementById('segExp'); if(se)[...se.children].forEach(b=>b.classList.toggle('on',b.dataset.v===state.exp));
+  const tb=$('themeBtn'); if(tb)tb.title='Theme: '+state.theme;
+}
+
+/* ============================================================ MISC */
+function closeAll(){ ['cmdOverlay','setOverlay'].forEach(id=>{const e=$(id);if(e)e.remove()}); closePops(); }
+let toastTimer;
+function toast(msg){ let t=$('wdToast'); if(t)t.remove();
+  t=document.createElement('div'); t.className='toast'; t.id='wdToast'; t.textContent=msg;
+  document.body.appendChild(t); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.remove(),1900);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedevs — design directions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+</head>
+<body>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0e0f;color:#e9ebe6;font-family:'Manrope','Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding:44px 24px 90px}
+.disp{font-family:'Unbounded','Manrope',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* masthead */
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'Unbounded','Manrope',sans-serif;font-weight:700;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#9aa39a}
+.eyebrow i{width:24px;height:2px;background:#9efb25;border-radius:2px}
+.masthead h1{font-family:'Unbounded','Manrope',sans-serif;font-weight:800;font-size:clamp(26px,4vw,40px);
+  letter-spacing:-.02em;line-height:1.05;margin:14px 0 10px;text-wrap:balance}
+.masthead h1 b{color:#9efb25}
+.masthead p{color:#9aa39a;max-width:620px;font-size:15px}
+.masthead .hint{margin-top:14px;font-size:13px;color:#6e756d}
+.masthead .hint b{color:#c9d2c4;font-weight:600}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:38px}
+@media(max-width:920px){.grid{grid-template-columns:1fr}}
+
+.card-head{display:flex;gap:13px;margin-bottom:13px;align-items:flex-start}
+.cn{font-family:'JetBrains Mono',monospace;font-size:12px;color:#5f665d;font-weight:500;padding-top:3px;flex:0 0 auto}
+.ct{min-width:0}
+.ct .nm{font-size:16px;font-weight:800;font-family:'Unbounded','Manrope',sans-serif;letter-spacing:-.01em;display:inline}
+.vibe{display:inline-block;margin-left:9px;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:#9efb25;border:1px solid rgba(158,251,37,.32);border-radius:5px;padding:1px 6px;vertical-align:middle}
+.desc{display:block;margin-top:5px;font-size:12.5px;color:#9aa39a;line-height:1.5}
+
+/* ============================================================ SHARED FRAME (skinned by vars) */
+.frame{position:relative;height:440px;display:flex;overflow:hidden;border-radius:20px;isolation:isolate;
+  background:var(--bg);color:var(--tx);border:1px solid var(--bd);font-size:12px}
+.frame > *{position:relative;z-index:1}
+.f-rail{width:52px;flex:0 0 auto;background:var(--rail);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;align-items:center;gap:11px;padding:12px 0;z-index:1}
+.rail-dot{width:22px;height:5px;border-radius:3px;background:var(--dim)}
+.rail-dot.on{background:var(--accent)}
+.mini-bot{display:inline-grid;place-items:center;width:30px;height:28px;border-radius:9px;background:var(--botdisc);flex:0 0 auto}
+.mini-bot.sm{width:22px;height:20px;border-radius:6px}
+.mini-bot svg{display:block}
+.f-main{flex:1;display:flex;flex-direction:column;min-width:0;z-index:1}
+.f-top{height:44px;flex:0 0 auto;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px;padding:0 12px}
+.f-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 4px;border-radius:999px;background:var(--panel);
+  border:1px solid var(--bd2);font-weight:700;font-size:11px}
+.f-cv{color:var(--dim2);font-size:9px}
+.f-title{color:var(--dim2);font-weight:600}
+.f-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:13px;padding:16px 18px}
+.f-eyebrow{display:flex;align-items:center;gap:8px;font-size:9px;font-weight:800;letter-spacing:.2em;color:var(--dim2)}
+.f-eyebrow i{width:16px;height:2px;background:var(--accent);border-radius:2px}
+.f-greet{font-family:'Unbounded','Manrope',sans-serif;font-weight:800;font-size:23px;letter-spacing:-.01em;line-height:1.05}
+.f-greet b{color:var(--accent)}
+.f-msg{display:flex;gap:9px;align-items:flex-start}
+.f-bubble{background:var(--panel);border:1px solid var(--bd2);border-radius:4px 13px 13px 13px;padding:9px 12px;line-height:1.5;max-width:80%}
+.f-bubble b{color:var(--tx);font-weight:700}
+.f-composer{flex:0 0 auto;margin:0 14px 14px;display:flex;align-items:center;gap:9px;background:var(--comp);
+  border:1px solid var(--bd2);border-radius:15px;padding:9px 9px 9px 12px}
+.f-plus{color:var(--dim2);font-size:15px}
+.f-ph{flex:1;color:var(--dim2)}
+.f-send{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--send);color:var(--send-ink);font-weight:800;flex:0 0 auto}
+
+/* default vars */
+.frame{--bg:#252728;--tx:#f2f4ee;--bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.12);--rail:#1c1e1f;
+  --panel:#2c2f30;--comp:#1c1e1f;--dim:rgba(255,255,255,.12);--dim2:#8b928a;--accent:#9efb25;
+  --send:#9efb25;--send-ink:#16200a;--botdisc:radial-gradient(circle at 50% 32%,#34393b,#1d2021)}
+
+/* ============================================================ 01 · AURORA GLASS */
+.d-aurora .frame{--bg:#131517;--tx:#eef1ea;--bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.13);
+  --rail:rgba(255,255,255,.03);--panel:rgba(255,255,255,.055);--comp:rgba(255,255,255,.06);
+  --dim:rgba(255,255,255,.14);--dim2:#a0a99f;--accent:#9efb25;--send:#9efb25;--send-ink:#16200a}
+.d-aurora .frame::before{content:"";position:absolute;inset:-25%;z-index:0;
+  background:
+    radial-gradient(300px 240px at 22% 18%, rgba(158,251,37,.30), transparent 60%),
+    radial-gradient(320px 280px at 82% 26%, rgba(56,189,248,.24), transparent 60%),
+    radial-gradient(300px 280px at 68% 96%, rgba(168,85,247,.24), transparent 60%);
+  filter:blur(34px);animation:aurora 16s ease-in-out infinite alternate}
+@keyframes aurora{to{transform:translate3d(4%,3%,0) rotate(7deg) scale(1.12)}}
+.d-aurora .f-chip,.d-aurora .f-bubble,.d-aurora .f-composer{backdrop-filter:blur(14px)}
+
+/* ============================================================ 02 · OLED NEON */
+.d-neon .frame{--bg:#000;--tx:#e9ede6;--bd:rgba(158,251,37,.16);--bd2:rgba(158,251,37,.30);
+  --rail:#040504;--panel:#0b0d0a;--comp:#0a0c09;--dim:#1c221a;--dim2:#7d8a72;--accent:#9efb25;
+  --send:#9efb25;--send-ink:#0a0f04;--botdisc:radial-gradient(circle at 50% 32%,#12160e,#000)}
+.d-neon .frame::before{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;z-index:0;
+  background:radial-gradient(120% 100% at 50% 135%, rgba(158,251,37,.14), transparent 60%)}
+.d-neon .f-send{box-shadow:0 0 16px rgba(158,251,37,.65)}
+.d-neon .f-greet b{text-shadow:0 0 18px rgba(158,251,37,.75)}
+.d-neon .f-eyebrow i{box-shadow:0 0 8px var(--accent)}
+.d-neon .rail-dot.on{box-shadow:0 0 8px var(--accent)}
+
+/* ============================================================ 03 · SOFT MINIMAL */
+.d-soft .frame{--bg:#1b1c1e;--tx:#e7e9e4;--bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.09);
+  --rail:#191a1c;--panel:#232427;--comp:#232427;--dim:rgba(255,255,255,.1);--dim2:#8b8f88;--accent:#9efb25;
+  --send:#eef1ea;--send-ink:#1b1c1e;--botdisc:radial-gradient(circle at 50% 32%,#34393b,#1d2021)}
+.d-soft .f-body{gap:15px}
+.d-soft .f-bubble,.d-soft .f-composer{border-radius:14px}
+.d-soft .f-bubble{border-radius:5px 14px 14px 14px}
+
+/* ============================================================ 04 · FROST GLASS */
+.d-frost .frame{--bg:#0e1310;--tx:#eff5ef;--bd:rgba(255,255,255,.16);--bd2:rgba(255,255,255,.2);
+  --rail:rgba(255,255,255,.06);--panel:rgba(255,255,255,.11);--comp:rgba(255,255,255,.13);
+  --dim:rgba(255,255,255,.22);--dim2:#c6d0c6;--accent:#b6ff4a;--send:#eff5ef;--send-ink:#12160e;
+  --botdisc:radial-gradient(circle at 50% 32%,#3a4038,#20261e);border-radius:24px}
+.d-frost .frame::before{content:"";position:absolute;inset:-12%;z-index:0;
+  background:
+    radial-gradient(280px 280px at 14% 22%, rgba(158,251,37,.42), transparent 62%),
+    radial-gradient(300px 300px at 86% 78%, rgba(45,212,191,.36), transparent 62%),
+    radial-gradient(260px 260px at 62% 8%, rgba(250,204,21,.26), transparent 62%);
+  filter:blur(22px)}
+.d-frost .f-rail,.d-frost .f-chip,.d-frost .f-bubble,.d-frost .f-composer{backdrop-filter:blur(20px) saturate(1.3)}
+.d-frost .f-bubble{border-radius:6px 18px 18px 18px}
+.d-frost .f-composer{border-radius:18px}
+
+/* ============================================================ 05 · EDITORIAL BOLD */
+.d-editorial .frame{--bg:#1d1e1d;--tx:#f4f4ee;--bd:rgba(255,255,255,.1);--bd2:rgba(255,255,255,.14);
+  --rail:#151513;--panel:#262725;--comp:#151513;--dim:rgba(255,255,255,.12);--dim2:#90908a;--accent:#9efb25;
+  --send:#9efb25;--send-ink:#16200a;--botdisc:radial-gradient(circle at 50% 32%,#34393b,#1d2021);border-radius:13px}
+.d-editorial .f-greet{font-size:31px;letter-spacing:-.03em;line-height:.98;font-weight:900}
+.d-editorial .f-eyebrow{font-size:10px;letter-spacing:.3em}
+.d-editorial .f-bubble{border:none;border-left:3px solid var(--accent);border-radius:0 12px 12px 0;background:var(--panel)}
+.d-editorial .f-composer{border-radius:12px}
+.d-editorial .f-chip{border-radius:9px}
+
+/* ============================================================ 06 · SPOTLIGHT */
+.d-spot .frame{--bg:#0c0d0e;--tx:#e9ebe6;--bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.1);
+  --rail:#0a0b0c;--panel:#141517;--comp:#141517;--dim:rgba(255,255,255,.08);--dim2:#7f857c;--accent:#9efb25;
+  --send:#9efb25;--send-ink:#16200a;--botdisc:radial-gradient(circle at 50% 32%,#2a2e2c,#111312)}
+.d-spot .frame::before{content:"";position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(480px 340px at 50% 80%, rgba(158,251,37,.15), transparent 60%),
+    radial-gradient(760px 520px at 50% 62%, rgba(255,255,255,.045), transparent 60%)}
+.d-spot .f-composer{box-shadow:0 22px 60px rgba(0,0,0,.6),0 0 30px rgba(158,251,37,.13)}
+.d-spot .f-top,.d-spot .f-rail{opacity:.82}
+
+.footer{margin-top:44px;padding:22px 24px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(255,255,255,.02);
+  font-size:14px;color:#c9d2c4}
+.footer b{color:#9efb25}
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <div class="eyebrow"><i></i> Wedevs · Design directions</div>
+    <h1>Pick a direction — <b>then I build it out.</b></h1>
+    <p>Six genuinely different takes on the same chat interface. All keep the brand DNA — dark ground, volt lime, your mascot teammates — but each has its own mood, depth, and energy.</p>
+    <div class="hint">Tell me a number or name — e.g. <b>“2, the neon one”</b>. You can also mix: <b>“Aurora background + Soft Minimal panels.”</b></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="footer">Amar recommendation shune chao? Bolo, ami protita-r trade-off boojhiye debo — tarpor tomar pochonder ta niye <b>full interface</b> build kore debo.</div>
+</div>
+
+<script>
+const M=(s)=>`<svg width="${s}" height="${s*0.94}" viewBox="0 0 64 60" fill="none">
+  <circle cx="32" cy="6" r="3.4" fill="#9efb25"/><line x1="32" y1="9" x2="32" y2="15" stroke="#8b9384" stroke-width="2.4"/>
+  <rect x="14" y="15" width="36" height="29" rx="12" fill="#f2f4ee"/><rect x="20" y="23" width="24" height="13" rx="6.5" fill="#17191a"/>
+  <circle cx="27.5" cy="29.5" r="2.7" fill="#9efb25"/><circle cx="36.5" cy="29.5" r="2.7" fill="#9efb25"/></svg>`;
+
+const DIRS=[
+  {cls:'d-aurora',   n:'Aurora Glass',   v:'Glass · Mesh',       d:'Glassy panels floating over a living color mesh — modern, premium, unmistakably “AI”.'},
+  {cls:'d-neon',     n:'OLED Neon',      v:'Black · Neon',       d:'True-black OLED ground with volt neon glow and hairline outlines — sharp, techy, high-contrast.'},
+  {cls:'d-soft',     n:'Soft Minimal',   v:'Calm · Refined',     d:'Low-contrast, roomy, zero glow — Linear-style restraint. The “quiet premium” take.'},
+  {cls:'d-frost',    n:'Frost Glass',    v:'Frosted · Airy',     d:'Heavy frosted glass over saturated blobs — bright, layered, Apple-Vision energy.'},
+  {cls:'d-editorial',n:'Editorial Bold', v:'Type · Structure',   d:'Oversized Unbounded display and accent bars — confident, magazine-like, brand-forward.'},
+  {cls:'d-spot',     n:'Spotlight',      v:'Cinematic · Focus',  d:'Near-black with one dramatic spotlight behind the composer — everything else recedes.'}
+];
+
+function frame(){ return `
+  <div class="frame">
+    <div class="f-rail">
+      <span class="mini-bot">${M(24)}</span>
+      <span class="rail-dot on"></span><span class="rail-dot"></span><span class="rail-dot"></span>
+    </div>
+    <div class="f-main">
+      <div class="f-top">
+        <span class="f-chip"><span class="mini-bot sm">${M(16)}</span> Writer <span class="f-cv">▾</span></span>
+        <span class="f-title">New chat</span>
+      </div>
+      <div class="f-body">
+        <div class="f-eyebrow"><i></i> Your AI teammates</div>
+        <div class="f-greet">Good evening, Hasib<b>.</b></div>
+        <div class="f-msg">
+          <span class="mini-bot">${M(24)}</span>
+          <div class="f-bubble">Here's a launch outline that leads with your <b>“no hidden tiers”</b> angle — want the intro paragraph next?</div>
+        </div>
+      </div>
+      <div class="f-composer">
+        <span class="f-plus">＋</span>
+        <span class="f-ph">Message Writer…</span>
+        <span class="f-send">↑</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+document.getElementById('grid').innerHTML = DIRS.map((x,i)=>`
+  <article class="card ${x.cls}">
+    <div class="card-head">
+      <div class="cn">${String(i+1).padStart(2,'0')}</div>
+      <div class="ct"><span class="nm">${x.n}</span><span class="vibe">${x.v}</span><span class="desc">${x.d}</span></div>
+    </div>
+    ${frame()}
+  </article>`).join('');
+</script>
+</body>
+</html>

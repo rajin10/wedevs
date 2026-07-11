@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedevs Codex — AI Web Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM (Codex Variant)
+       ============================================================ */
+    :root {
+      --bg: #141617; 
+      --sidebar: #1a1c1e;
+      --panel: #1e2022;
+      --raise: #25282a;
+      --chalk: #f3f5f0;
+      --mist: #a3aaa0;
+      --ghost: #6b726a;
+      --hair: rgba(255,255,255,.06);
+      --hair2: rgba(255,255,255,.12);
+      --hover: rgba(255,255,255,.04);
+      --active: rgba(255,255,255,.08);
+      
+      /* Active Accent: Codex Cyber Green */
+      --accent: #00ff66;
+      --accent-glow: rgba(0,255,102,0.15);
+      --accent-ink: #051a0e;
+
+      /* Prototype Palette 2: Obsidian Gold */
+      --gold: #ffaa00;
+      /* Prototype Palette 3: Claude Purple */
+      --purple: #cc66ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--chalk);
+      font-size: 14px;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .unbound { font-family: 'Unbounded', sans-serif; }
+    button { cursor: pointer; border: none; background: none; color: inherit; }
+
+    /* ============================================================
+       LAYOUT STYLES
+       ============================================================ */
+    .app-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--hair);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+    }
+    .logo { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .logo b { color: var(--accent); }
+    
+    .nav-group { display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ghost); margin-bottom: 4px; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; color: var(--mist); transition: 0.2s; text-align: left;}
+    .nav-item:hover, .nav-item.active { background: var(--hover); color: var(--chalk); }
+    .nav-item.active { border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; }
+
+    /* Center Chat Area */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      border-right: 1px solid var(--hair);
+    }
+    .panel-header {
+      height: 52px;
+      border-bottom: 1px solid var(--hair);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      justify-content: space-between;
+    }
+    .chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .msg { display: flex; gap: 12px; max-width: 85%; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-bubble { padding: 12px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--hair); line-height: 1.5; }
+    .msg.user .msg-bubble { background: var(--hair2); }
+    
+    /* Code Execution Indicator Block */
+    .agent-status-box {
+      background: rgba(0, 255, 102, 0.03);
+      border: 1px dashed rgba(0, 255, 102, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pulse-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+    /* Composer Box */
+    .composer-wrap { padding: 16px; background: var(--bg); }
+    .composer-box { background: var(--panel); border: 1px solid var(--hair2); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .composer-box textarea { background: none; border: none; color: var(--chalk); resize: none; outline: none; font-family: inherit; font-size: 14px; min-height: 40px; }
+    .composer-actions { display: flex; justify-content: space-between; align-items: center; }
+    .send-btn { background: var(--accent); color: var(--accent-ink); padding: 6px 16px; border-radius: 20px; font-weight: 700; transition: 0.2s; }
+    .send-btn:hover { opacity: 0.9; }
+
+    /* Right Artifacts / Live Preview Screen */
+    .preview-area {
+      flex: 1.2;
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+    }
+    .tabs { display: flex; background: var(--sidebar); border-bottom: 1px solid var(--hair); }
+    .tab { padding: 12px 20px; color: var(--mist); font-weight: 600; border-right: 1px solid var(--hair); position: relative; }
+    .tab.active { color: var(--chalk); background: var(--panel); }
+    .tab.active::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+    
+    .sandbox-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; height: calc(100% - 52px); }
+    .browser-mock { flex: 1; background: #ffffff; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--hair2); }
+    .browser-bar { height: 28px; background: #e0e0e0; display: flex; align-items: center; padding: 0 10px; gap: 6px; }
+    .browser-dot { width: 8px; height: 8px; background: #ff5f56; border-radius: 50%; }
+    .browser-dot:nth-child(2) { background: #ffbd2e; }
+    .browser-dot:nth-child(3) { background: #27c93f; }
+    .browser-url { background: #ffffff; height: 18px; flex: 1; margin-left: 10px; border-radius: 4px; font-size: 10px; color: #666; padding: 0 8px; display: flex; align-items: center; }
+    .browser-content { flex: 1; padding: 20px; color: #333; overflow-y: auto; background: #fafafa; }
+
+    /* Code View Mode */
+    .code-view { flex: 1; background: #17191a; border-radius: 8px; padding: 16px; overflow: auto; color: #a9b7c6; display: none; }
+
+    /* ============================================================
+       PROTOTYPE SWITCHER BAR (Bottom Floating)
+       ============================================================ */
+    .proto-switcher {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #000;
+      border: 1px solid var(--accent);
+      border-radius: 30px;
+      padding: 6px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 999;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .proto-btn { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px; transition: 0.2s; color: #fff;}
+    .proto-btn.active { background: var(--accent); color: var(--accent-ink); }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo unbound">Codex<b>.</b></div>
+    
+    <div class="nav-group">
+      <span class="nav-label">Current Task</span>
+      <button class="nav-item active">
+        <span>🌐</span> E-commerce Landing
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-label">Agent Capabilities</span>
+      <div class="nav-item">⚙️ Multi-file Edit: Active</div>
+      <div class="nav-item">📦 NPM Packages: Enabled</div>
+      <div class="nav-item">📡 API Integration: Live</div>
+    </div>
+  </aside>
+
+  <!-- CHAT AREA -->
+  <main class="chat-area">
+    <header class="panel-header">
+      <div class="unbound" style="font-weight:600;">Web Automation Engine</div>
+      <div class="mono" style="color: var(--ghost);">v2.4-stable</div>
+    </header>
+
+    <div class="chat-history" id="chatHistory">
+      <div class="msg user">
+        <div class="msg-bubble">আমি একটি মডার্ন গ্যাজেট শপের জন্য ল্যান্ডিং পেজ বানাতে চাই। এতে একটি হিরো সেকশন এবং ডার্ক থিমের কার্ড প্রোডাক্ট গ্রিড থাকবে।</div>
+      </div>
+      <div class="msg bot">
+        <div class="msg-bubble">
+          <p>অবশ্যই! আমি আপনার জন্য একটি প্রিমিয়াম ডার্ক-থিম গ্যাজেট শপের কোড আর্কিটেকচার জেনারেট করছি। একই সাথে এটি ডানপাশের লাইভ প্রিভিউ উইন্ডোতে মাউন্ট করা হচ্ছে।</p>
+          
+          <div class="agent-status-box">
+            <div class="pulse-dot"></div>
+            <div class="mono" style="color: var(--accent);">Codex is building index.html, styles.css...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer-box">
+        <textarea id="userInput" placeholder="কোড পরিবর্তন বা নতুন ফিচার অ্যাড করতে বলুন (যেমন: 'Add a login popup modal')..."></textarea>
+        <div class="composer-actions">
+          <span style="color: var(--ghost); font-size: 12px;">Ctrl + Enter to execute</span>
+          <button class="send-btn" onclick="triggerBuild()">Deploy Feature</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ARTIFACTS / PREVIEW AREA -->
+  <section class="preview-area">
+    <div class="tabs">
+      <button class="tab active" id="tabPre" onclick="switchView('preview')">Live Interactive Preview</button>
+      <button class="tab" id="tabCode" onclick="switchView('code')">Generated Code Output</button>
+    </div>
+
+    <div class="sandbox-body">
+      <!-- Browser Mockup View -->
+      <div class="browser-mock" id="browserMock">
+        <div class="browser-bar">
+          <div class="browser-dot"></div>
+          <div class="browser-dot"></div>
+          <div class="browser-dot"></div>
+          <div class="browser-url">https://localhost:3000/gadget-store</div>
+        </div>
+        <div class="browser-content" id="webContent">
+          <!-- Live injected UI -->
+          <div style="background:#111; color:#fff; padding:30px; border-radius:8px; text-align:center; height:100%;">
+            <h1 style="font-family:'Unbounded'; color:#00ff66; margin-bottom:10px;">CyberGadget X</h1>
+            <p style="color:#aaa; margin-bottom:20px;">Next-Gen Tech, Delivered Today.</p>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;">
+              <div style="background:#222; padding:15px; border-radius:6px; border:1px solid #333;">
+                <div style="font-weight:bold; color:#00ff66;">Quantum Watch</div>
+                <button style="background:#00ff66; color:#000; padding:4px 8px; border-radius:4px; font-size:11px; margin-top:8px; font-weight:bold;">$299 - Buy</button>
+              </div>
+              <div style="background:#222; padding:15px; border-radius:6px; border:1px solid #333;">
+                <div style="font-weight:bold; color:#00ff66;">Neural Buds Pro</div>
+                <button style="background:#00ff66; color:#000; padding:4px 8px; border-radius:4px; font-size:11px; margin-top:8px; font-weight:bold;">$149 - Buy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raw Code View -->
+      <pre class="code-view mono" id="codeMock">
+&lt;!-- Generated index.html --&gt;
+&lt;div class="hero"&gt;
+  &lt;h1&gt;CyberGadget X&lt;/h1&gt;
+  &lt;p&gt;Next-Gen Tech, Delivered Today.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- styles.css --&gt;
+.hero { background: #111; color: #fff; padding: 30px; }
+      </pre>
+    </div>
+  </section>
+
+</div>
+
+<!-- PROTOTYPE THEME SWITCHER -->
+<div class="proto-switcher">
+  <span style="color: #6b726a; font-size: 11px; font-weight: bold; padding-left: 6px;">DESIGN PROTOTYPES:</span>
+  <button class="proto-btn active" id="p1" onclick="changeTheme('cyber')">1. Cyber Green (Codex)</button>
+  <button class="proto-btn" id="p2" onclick="changeTheme('obsidian')">2. Obsidian Gold</button>
+  <button class="proto-btn" id="p3" onclick="changeTheme('claude')">3. Claude Purple</button>
+</div>
+
+<script>
+  function switchView(mode) {
+    if(mode === 'preview') {
+      document.getElementById('browserMock').style.display = 'flex';
+      document.getElementById('codeMock').style.display = 'none';
+      document.getElementById('tabPre').classList.add('active');
+      document.getElementById('tabCode').classList.remove('active');
+    } else {
+      document.getElementById('browserMock').style.display = 'none';
+      document.getElementById('codeMock').style.display = 'block';
+      document.getElementById('tabPre').classList.remove('active');
+      document.getElementById('tabCode').classList.add('active');
+    }
+  }
+
+  function changeTheme(theme) {
+    const root = document.documentElement;
+    document.querySelectorAll('.proto-btn').forEach(b => b.classList.remove('active'));
+    
+    if(theme === 'cyber') {
+      root.style.setProperty('--accent', '#00ff66');
+      root.style.setProperty('--accent-ink', '#051a0e');
+      document.getElementById('p1').classList.add('active');
+    } else if (theme === 'obsidian') {
+      root.style.setProperty('--accent', '#ffaa00');
+      root.style.setProperty('--accent-ink', '#1a1100');
+      document.getElementById('p2').classList.add('active');
+    } else if (theme === 'claude') {
+      root.style.setProperty('--accent', '#cc66ff');
+      root.style.setProperty('--accent-ink', '#1b002a');
+      document.getElementById('p3').classList.add('active');
+    }
+  }
+
+  function triggerBuild() {
+    const text = document.getElementById('userInput').value.trim();
+    if(!text) return;
+    
+    // Add user message
+    const history = document.getElementById('chatHistory');
+    history.innerHTML += `<div class="msg user"><div class="msg-bubble">${text}</div></div>`;
+    document.getElementById('userInput').value = '';
+    
+    // Add AI processing response
+    setTimeout(() => {
+      history.innerHTML += `
+        <div class="msg bot">
+          <div class="msg-bubble">
+            <p>আপনার রিকোয়েস্ট প্রসেস করা হচ্ছে। আমি লাইভ ক্যানভাস এবং সোর্স কোড আপডেট করে দিয়েছি!</p>
+            <div class="agent-status-box">
+              <div class="pulse-dot"></div>
+              <div class="mono" style="color: var(--accent);">Deploying changes to sandboxed iframe...</div>
+            </div>
+          </div>
+        </div>`;
+      history.scrollTop = history.scrollHeight;
+    }, 600);
+  }
+</script>
+</body>
+</html>
