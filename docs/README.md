@@ -18,6 +18,7 @@ Read in this order. Each document is a phase gate — finish one before starting
 | **[02-desktop-tauri.md](02-desktop-tauri.md)** | Phase 10: the Tauri v2 desktop app (native shell, auto-update, deep links) |
 | **[03-deployment.md](03-deployment.md)** | Phases 11–14: Docker on VPS, managed Supabase, CI/CD, TLS, desktop distribution, security, launch |
 | **[04-reference.md](04-reference.md)** | Env-var table, full Postgres schema + RLS, API contracts, repo tree, cost model |
+| **[PROGRESS.md](PROGRESS.md)** | **Live build report** — what's actually been built so far, why each piece matters, and every deviation from the plan (updated as work lands) |
 
 The **mockup** at `mockup/index.html` is the visual source of truth. The web UI must match it: Adaptive Canvas shell (collapsible left rail, centered chat, right Inspector that floats or pins), model/agent selector, plugin marketplace, Code workspace, Settings, both themes, and the "neutral = interactive · Volt = alive" rule.
 
