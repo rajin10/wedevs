@@ -1,6 +1,7 @@
+import { env } from "@/env";
+
 export const runtime = "nodejs";
 
 export function GET() {
-  const sha = process.env.GIT_SHA ?? "dev";
-  return Response.json({ ok: true, sha });
+  return Response.json({ ok: true, sha: env.GIT_SHA });
 }
