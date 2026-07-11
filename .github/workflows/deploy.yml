@@ -44,14 +44,15 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/wedevs-web:${{ github.sha }}
 
       - name: Copy compose files to the VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: "docker/docker-compose.yml,docker/Caddyfile"
-          target: ${{ secrets.VPS_APP_DIR }}
-          strip_components: 1
+        # Plain scp — reliable. (appleboy/scp-action + strip_components silently
+        # delivered nothing, leaving Caddy with no config to mount.)
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key \
+            docker/docker-compose.yml docker/Caddyfile \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_APP_DIR }}/"
 
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3

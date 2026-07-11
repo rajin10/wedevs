@@ -1,83 +1,83 @@
-# Wedevs — Deployment Activation Checklist
+# Wedevs — Deployment Operations
 
-**Status:** the CI/CD pipeline is committed and wired, but the deploy job is **dormant** — it is skipped on every push until you complete the steps below. Nothing deploys to a live server yet because no server/secrets are configured. This is by design.
+**Status:** the CI/CD pipeline is **live**. Every push/merge to `main` builds the
+web image in GitHub Actions, pushes it to GHCR, and deploys it to the VPS over
+SSH. The VPS currently serves on its **bare IP over HTTP** — swap in a domain to
+get automatic HTTPS (one `.env` change, no rebuild — see "Switching to a domain").
 **Last updated:** 2026-07-12.
 
 ---
 
-## What is already set up (in the repo)
+## Live target
 
-| File                           | Role                                                                                                                                                                    |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.github/workflows/ci.yml`     | **CI** — runs `lint / typecheck / test / build` on every PR and every push to `main`. Active now.                                                                       |
-| `.github/workflows/deploy.yml` | **Deploy** — builds the web image in GitHub Actions, pushes it to GHCR, then SSHes into your VPS and runs `docker compose up`. **Dormant** until you enable it (below). |
-| `apps/web/Dockerfile`          | Multi-stage build of the Next.js standalone image (built in CI).                                                                                                        |
-| `docker/docker-compose.yml`    | Production stack: `web` behind `caddy` (automatic HTTPS). Worker + Redis join in Phase 5/7.                                                                             |
-| `docker/Caddyfile`             | Reverse proxy + Let's Encrypt TLS for your domain.                                                                                                                      |
-| `docker/.env.example`          | Template for the `.env` you place on the VPS (domain + GHCR owner; no secrets).                                                                                         |
+| Thing        | Value                                                              |
+| ------------ | ------------------------------------------------------------------ |
+| URL          | `http://187.127.178.219`                                           |
+| Health check | `http://187.127.178.219/api/health` → `{ "ok": true, "sha": "…" }` |
+| Server       | Ubuntu 24.04 VPS (`srv1796377`), 2 vCPU / 8 GB / 96 GB             |
+| App dir      | `/opt/wedevs` (compose stack: `web` behind `caddy`)                |
+| Image        | `ghcr.io/rajin10/wedevs-web:latest` (private)                      |
 
-**How a deploy will flow once enabled:** push/merge to `main` → CI gates run → the deploy job builds `ghcr.io/rajin10/wedevs-web:latest` → copies the compose files to the VPS → `docker compose pull && up -d` → Caddy serves the new version over HTTPS. Health is verifiable at `https://<your-domain>/api/health` → `{ "ok": true, "sha": "<commit>" }`.
+> The VPS also runs an unrelated `factory-gateway` container (a WhatsApp AI
+> gateway) on port 4000. Wedevs is fully isolated from it — its own dir, its own
+> ports (80/443). Nothing here touches that container.
+
+## How a deploy flows
+
+Push/merge to `main` → CI gates (`lint / typecheck / test / build`) → the deploy
+job builds `ghcr.io/rajin10/wedevs-web:latest` + a `:<sha>` tag → copies
+`docker-compose.yml` + `Caddyfile` to `/opt/wedevs` → SSHes in, logs into GHCR
+with the workflow's own `GITHUB_TOKEN`, `docker compose pull && up -d` → Caddy
+serves the new version. The server's `/opt/wedevs/.env` is never overwritten, so
+server-specific settings persist across deploys.
+
+You can also run it on demand: **Actions → deploy → Run workflow**, or
+`gh workflow run deploy.yml --ref main`.
 
 ---
 
-## To go live — one-time setup
+## What is configured (already done)
 
-### 1. Provision a VPS
+| Item                           | Value / location                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------ |
+| Repo secret `VPS_HOST`         | `187.127.178.219`                                                                          |
+| Repo secret `VPS_USER`         | `root`                                                                                     |
+| Repo secret `VPS_APP_DIR`      | `/opt/wedevs`                                                                              |
+| Repo secret `VPS_SSH_KEY`      | ed25519 private deploy key (`wedevs-deploy`)                                               |
+| Repo variable `DEPLOY_ENABLED` | `true` (the on-switch)                                                                     |
+| Server `/opt/wedevs/.env`      | `SITE_ADDRESS=:80`, `APP_URL=http://187.127.178.219`, `GHCR_OWNER=rajin10`, `GIT_SHA=prod` |
 
-- A server (≥ 2 vCPU / 4 GB to start) with **Docker + Docker Compose v2** installed.
-- Create an app directory, e.g. `/opt/wedevs`.
-- Point a **domain's DNS** (A/AAAA record) at the server's IP.
+**No GHCR PAT is needed.** The VPS pulls the private image using the deploy
+workflow's built-in `GITHUB_TOKEN`, forwarded to the SSH step for the duration
+of the run — no long-lived registry token to store or rotate.
 
-### 2. Put the deploy env on the VPS
+---
 
-In the app directory (e.g. `/opt/wedevs`), create a `.env` from `docker/.env.example`:
+## Switching to a domain (HTTPS)
 
-```
-DOMAIN=app.yourdomain.com
-GHCR_OWNER=rajin10
-GIT_SHA=prod
-```
+When a real domain is ready:
 
-### 3. Create an SSH key for the deploy
+1. Point the domain's **DNS A record** at `187.127.178.219`.
+2. On the server, edit `/opt/wedevs/.env`:
+   ```
+   SITE_ADDRESS=app.yourdomain.com
+   APP_URL=https://app.yourdomain.com
+   ```
+3. `cd /opt/wedevs && docker compose up -d` (or just re-run the deploy).
 
-On your machine: `ssh-keygen -t ed25519 -C "wedevs-deploy" -f wedevs_deploy` (no passphrase). Add the **public** key (`wedevs_deploy.pub`) to the VPS user's `~/.ssh/authorized_keys`. The **private** key goes into the `VPS_SSH_KEY` secret below.
-
-### 4. Create a GHCR pull token
-
-GitHub → Settings → Developer settings → **Personal access token** (classic) with scope **`read:packages`**. The VPS uses it to pull the private image. (Alternatively, make the GHCR package public and skip `GHCR_PAT`.)
-
-### 5. Add the GitHub secrets and variable
-
-Repo → **Settings → Secrets and variables → Actions**.
-
-**Secrets** (Secrets tab):
-
-| Secret        | Value                                               |
-| ------------- | --------------------------------------------------- |
-| `VPS_HOST`    | Server IP or hostname                               |
-| `VPS_USER`    | SSH username (e.g. `deploy` or `root`)              |
-| `VPS_SSH_KEY` | The **private** SSH key from step 3 (full contents) |
-| `VPS_APP_DIR` | App directory on the server, e.g. `/opt/wedevs`     |
-| `GHCR_PAT`    | The `read:packages` token from step 4               |
-
-**Variable** (Variables tab) — this is the on-switch:
-
-| Variable         | Value  |
-| ---------------- | ------ |
-| `DEPLOY_ENABLED` | `true` |
-
-> `GITHUB_TOKEN` (used to **push** the image in CI) is provided automatically — you do not create it.
-
-### 6. First deploy
-
-Push (or merge) to `main`, or run the **deploy** workflow manually (Actions → deploy → _Run workflow_). Watch the run; then check `https://app.yourdomain.com/api/health`.
+Caddy then obtains a Let's Encrypt certificate automatically and serves HTTPS.
+No image rebuild — the site address is read from env at container start.
 
 ---
 
 ## Notes & guardrails
 
-- Until `DEPLOY_ENABLED=true`, the deploy job **skips** cleanly on every push — no red failures.
-- The image is private on GHCR; the VPS authenticates with `GHCR_PAT`.
-- No secrets ever live in the repo — the web app reads config through its validated env module, and all deploy credentials live in GitHub Secrets / the VPS `.env`.
-- Worker + Redis services are intentionally not in `docker-compose.yml` yet; they arrive with the async-jobs work in Phase 5/7.
+- Serving on a **bare IP must be HTTP**: Let's Encrypt cannot issue a certificate
+  for an IP address, so `SITE_ADDRESS=:80` (plain HTTP) is correct until a domain
+  is attached. The env-driven Caddyfile flips to HTTPS the moment `SITE_ADDRESS`
+  becomes a hostname.
+- No secrets live in the repo — the web app reads config through its validated
+  env module; all deploy credentials live in GitHub Secrets / the server `.env`.
+- Worker + Redis services are intentionally not in `docker-compose.yml` yet; they
+  arrive with the async-jobs work in Phase 5/7.
 - The full background/rationale for this topology is in [03-deployment.md](03-deployment.md).
