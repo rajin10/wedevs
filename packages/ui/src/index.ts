@@ -34,6 +34,10 @@ export {
   CommandShortcut,
 } from "./primitives/command";
 
+// components
+export { LeftRail } from "./components/LeftRail/LeftRail";
+export type { LeftRailProps } from "./components/LeftRail/LeftRail";
+
 // mascots
 export { Robo } from "./mascots/Robo";
 export type { RoboProps } from "./mascots/Robo";
