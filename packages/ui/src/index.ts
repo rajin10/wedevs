@@ -1,1 +1,3 @@
-export const UI_PACKAGE = "@wedevs/ui" as const;
+export { cn } from "./lib/cn";
+export { useReducedMotion } from "./lib/use-reduced-motion";
+export type { ClassValue } from "clsx";
