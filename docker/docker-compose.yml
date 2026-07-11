@@ -13,7 +13,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN: ${DOMAIN}
+      SITE_ADDRESS: "${SITE_ADDRESS:-:80}"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_APP_URL: https://${DOMAIN}
+      NEXT_PUBLIC_APP_URL: "${APP_URL:-http://localhost:3000}"
       GIT_SHA: ${GIT_SHA:-prod}
     expose:
       - "3000"
