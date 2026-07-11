@@ -2,7 +2,10 @@
   "name": "wedevs",
   "private": true,
   "packageManager": "pnpm@11.10.0",
-  "engines": { "node": ">=22", "pnpm": ">=9" },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -10,11 +13,17 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\"",
-    "prepare": "husky || true"
+    "prepare": "husky"
   },
   "devDependencies": {
     "turbo": "^2.1.0",
     "prettier": "^3.3.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.0",
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "eslint": "^9.12.0",
+    "@wedevs/config": "workspace:*"
   }
 }
