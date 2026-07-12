@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
-import { ThemeProvider } from "@wedevs/ui";
+import { ThemeProvider, ToastProvider } from "@wedevs/ui";
 import { fontDisplay, fontSans, fontMono } from "./fonts";
 
 export const metadata = {
@@ -16,7 +16,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
