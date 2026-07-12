@@ -1,7 +1,10 @@
 /* AppShell — shell geometry & state machine.
    Ported from mockup/index.html: 96 (.app), 165-204 (.workspace/.body/.main),
-   345-349 (.drop), 388-393 (Inspector container), 710/714-722 (rail drawer),
+   388-393 (Inspector container), 710/714-722 (rail drawer),
    723-728 (Inspector full-screen sheet).
+   NOTE: the mockup's 345-349 (.drop) file-drop overlay is NOT ported here —
+   it lives solely in Composer's own DropOverlay (Composer.tsx) so there is
+   exactly one "Drop files to attach" banner, not two overlapping ones.
 
    DEVIATION FROM THE RAW MOCKUP CSS: the mockup targets its own semantic
    classes (`.rail`, `.rail-open-btn`, `.brand-name`, `.lbl`, `.grp-h`,
@@ -112,24 +115,6 @@
   bottom: 0;
   width: 390px;
   z-index: 30;
-}
-
-/* file-drop overlay — sanctioned drag-active accent affordance (mockup 345-349) */
-.drop {
-  position: absolute;
-  inset: 8px 24px;
-  border-radius: 18px;
-  border: 2px dashed var(--accent-line);
-  background: var(--accent-soft);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: var(--accent);
-  font-weight: 600;
-  z-index: 5;
-  backdrop-filter: blur(2px);
 }
 
 /* full-screen Inspector sheet on very narrow viewports (mockup 723-728).

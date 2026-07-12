@@ -325,52 +325,55 @@ export function LeftRail(props: LeftRailProps) {
                     <span className="min-w-0 flex-1 truncate text-[14px]">
                       {chat.title}
                     </span>
-                    {chat.pinned ? (
+                    {chat.pinned && (
                       <span className="flex-none text-[var(--text-3)]">
                         <StarIcon small />
                       </span>
-                    ) : (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            aria-label={`Chat options for ${chat.title}`}
-                            className="ml-auto grid h-[22px] w-[22px] flex-none place-items-center rounded-md text-[var(--text-3)] opacity-0 transition-opacity hover:bg-[var(--active)] hover:text-[var(--text)] group-hover:opacity-100 focus-visible:opacity-100"
-                          >
-                            <DotsIcon />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuItem
-                            onSelect={() => onChatAction(chat.id, "pin")}
-                          >
-                            <StarIcon small />
-                            Pin
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => setRenamingId(chat.id)}
-                          >
-                            <RenameIcon />
-                            Rename
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => onChatAction(chat.id, "archive")}
-                          >
-                            <ArchiveIcon />
-                            Archive
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            variant="danger"
-                            data-danger="true"
-                            onSelect={() => onChatAction(chat.id, "delete")}
-                          >
-                            <ArchiveIcon />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     )}
+                    {/* every recent row (pinned or not) gets the same
+                        keyboard-operable ⋯ menu — pinned rows previously
+                        rendered only a static star with no way to
+                        rename/archive/delete via keyboard. */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label={`Chat options for ${chat.title}`}
+                          className="ml-auto grid h-[22px] w-[22px] flex-none place-items-center rounded-md text-[var(--text-3)] opacity-0 transition-opacity hover:bg-[var(--active)] hover:text-[var(--text)] group-hover:opacity-100 focus-visible:opacity-100"
+                        >
+                          <DotsIcon />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem
+                          onSelect={() => onChatAction(chat.id, "pin")}
+                        >
+                          <StarIcon small />
+                          Pin
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => setRenamingId(chat.id)}
+                        >
+                          <RenameIcon />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => onChatAction(chat.id, "archive")}
+                        >
+                          <ArchiveIcon />
+                          Archive
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="danger"
+                          data-danger="true"
+                          onSelect={() => onChatAction(chat.id, "delete")}
+                        >
+                          <ArchiveIcon />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 ),
               )}
@@ -515,6 +518,7 @@ function RenameRow({ chat, onCommit, onCancel }: RenameRowProps) {
           }
         }}
         onBlur={() => finish(value)}
+        data-live="rename"
         className="h-auto min-w-0 flex-1 rounded-md border border-[var(--accent-line)] bg-[var(--surface)] px-[7px] py-[2px] text-[14px] text-[var(--text)]"
       />
     </div>

@@ -164,3 +164,21 @@ body,
     transition: none !important;
   }
 }
+
+/* ---- universal reduced-motion guard: belt-and-suspenders reset that
+   disables EVERY animation/transition on the page, not just the layer-local
+   selectors above. Catches Radix/tw-animate-css's ungated dialog/dropdown-
+   menu/popover/tooltip open/close animations and any component-level width
+   transitions (e.g. LeftRail's collapse) that don't have their own
+   useReducedMotion() gate. Loaded globally via apps/web's globals.css
+   (@import "@wedevs/ui/styles/keyframes.css"), so it applies app-wide. ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

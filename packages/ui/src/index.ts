@@ -2,6 +2,11 @@ export * from "./types";
 
 export { cn } from "./lib/cn";
 export { useReducedMotion } from "./lib/use-reduced-motion";
+export {
+  useMediaQuery,
+  INSPECTOR_PIN_QUERY,
+  RAIL_DRAWER_QUERY,
+} from "./lib/use-media-query";
 export type { ClassValue } from "clsx";
 
 export { useThemeStore, resolveTheme, THEME_STORAGE_KEY } from "./store/theme";

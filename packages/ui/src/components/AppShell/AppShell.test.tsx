@@ -146,21 +146,28 @@ describe("AppShell", () => {
     },
   );
 
-  it("shows the file-drop overlay only when dragging in chat view", () => {
+  it("stamps data-dragging from the dragging+view state but renders no drop banner of its own (Composer owns that overlay)", () => {
     const { rerender } = render(
       <AppShell {...baseProps({ view: "chat", dragging: true })} />,
     );
-    expect(screen.getByTestId("file-drop")).toBeInTheDocument();
     expect(screen.getByTestId("app-shell")).toHaveAttribute(
       "data-dragging",
       "1",
     );
+    expect(screen.queryByTestId("file-drop")).not.toBeInTheDocument();
+    expect(screen.queryByText("Drop files to attach")).not.toBeInTheDocument();
 
     rerender(<AppShell {...baseProps({ view: "market", dragging: true })} />);
-    expect(screen.queryByTestId("file-drop")).not.toBeInTheDocument();
+    expect(screen.getByTestId("app-shell")).toHaveAttribute(
+      "data-dragging",
+      "0",
+    );
 
     rerender(<AppShell {...baseProps({ view: "chat", dragging: false })} />);
-    expect(screen.queryByTestId("file-drop")).not.toBeInTheDocument();
+    expect(screen.getByTestId("app-shell")).toHaveAttribute(
+      "data-dragging",
+      "0",
+    );
   });
 
   it("clicking the scrim closes the rail drawer", () => {
@@ -184,5 +191,46 @@ describe("AppShell", () => {
     installMatchMedia(1400);
     fireEvent.keyDown(screen.getByTestId("app-shell"), { key: "Escape" });
     expect(onPanelChange).not.toHaveBeenCalled();
+  });
+
+  describe("mobile rail drawer focus management", () => {
+    it("Escape closes the drawer when it's open", () => {
+      installMatchMedia(880);
+      const onRailChange = vi.fn();
+      render(<AppShell {...baseProps({ rail: "open", onRailChange })} />);
+      fireEvent.keyDown(screen.getByTestId("app-shell"), { key: "Escape" });
+      expect(onRailChange).toHaveBeenCalledWith("collapsed");
+    });
+
+    it("moves focus into the rail when the drawer opens", () => {
+      installMatchMedia(880);
+      render(
+        <AppShell
+          {...baseProps({
+            rail: "open",
+            leftRail: (
+              <div data-testid="left-rail">
+                <button type="button">first focusable</button>
+              </div>
+            ),
+          })}
+        />,
+      );
+      expect(screen.getByText("first focusable")).toHaveFocus();
+    });
+
+    it("marks .workspace inert while the drawer is open, and not otherwise", () => {
+      installMatchMedia(880);
+      const { container, rerender } = render(
+        <AppShell {...baseProps({ rail: "open" })} />,
+      );
+      const workspace = container.querySelector(".workspace");
+      expect(workspace).toHaveAttribute("inert");
+
+      rerender(<AppShell {...baseProps({ rail: "collapsed" })} />);
+      expect(container.querySelector(".workspace")).not.toHaveAttribute(
+        "inert",
+      );
+    });
   });
 });

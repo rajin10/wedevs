@@ -2,62 +2,19 @@
 
 import * as React from "react";
 import type { AppShellProps, PanelMode } from "../../types";
+import {
+  useMediaQuery,
+  INSPECTOR_PIN_QUERY,
+  RAIL_DRAWER_QUERY,
+} from "../../lib/use-media-query";
 import "./AppShell.css";
 
 export type { AppShellProps };
 
-/**
- * SSR-safe media-query subscription — same `useSyncExternalStore` pattern as
- * `../../lib/use-reduced-motion.ts`. Resolves synchronously on the first
- * client render (no extra effect-triggered re-render) and reports `false`
- * on the server / before hydration.
- */
-function useMediaQuery(query: string): boolean {
-  const subscribe = React.useCallback(
-    (onChange: () => void): (() => void) => {
-      if (
-        typeof window === "undefined" ||
-        typeof window.matchMedia !== "function"
-      ) {
-        return () => {};
-      }
-      const mql = window.matchMedia(query);
-      mql.addEventListener("change", onChange);
-      return () => mql.removeEventListener("change", onChange);
-    },
-    [query],
-  );
-  const getSnapshot = React.useCallback((): boolean => {
-    if (
-      typeof window === "undefined" ||
-      typeof window.matchMedia !== "function"
-    ) {
-      return false;
-    }
-    return window.matchMedia(query).matches;
-  }, [query]);
-  const getServerSnapshot = React.useCallback((): boolean => false, []);
-  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
-function DropIcon(): React.ReactElement {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="30"
-      height="30"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <path d="M7 10l5 5 5-5M12 15V3" />
-    </svg>
-  );
-}
+/** First focusable element inside a container — used to move focus into the
+ * rail when the mobile drawer opens. */
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
 /**
  * AppShell — the Adaptive Canvas. Owns shell *geometry* only: a left rail
@@ -84,9 +41,11 @@ export function AppShell(props: AppShellProps) {
   } = props;
 
   // Breakpoints are read in JS (not CSS media queries) so the collapses are
-  // deterministically unit-testable via a `matchMedia` mock.
-  const belowPin = useMediaQuery("(max-width: 1180px)"); // pinned -> overlay
-  const belowDrawer = useMediaQuery("(max-width: 900px)"); // rail -> drawer
+  // deterministically unit-testable via a `matchMedia` mock. Shared with
+  // apps/web's shell page via packages/ui's lib/use-media-query (single
+  // source of truth for both query strings).
+  const belowPin = useMediaQuery(INSPECTOR_PIN_QUERY); // pinned -> overlay
+  const belowDrawer = useMediaQuery(RAIL_DRAWER_QUERY); // rail -> drawer
 
   // A pinned Inspector reflows to a floating overlay on narrow viewports.
   const effectivePanel: PanelMode =
@@ -95,7 +54,16 @@ export function AppShell(props: AppShellProps) {
   // Conditionally mounted (not kept at width:0) so "closed hides Inspector"
   // is assertable in jsdom, which doesn't compute stylesheet layout.
   const showInspector = effectivePanel !== "closed" && inspector != null;
-  const showDrop = dragging && view === "chat";
+
+  // NOTE: the drag-active file-drop banner is Composer's own DropOverlay
+  // (Composer.tsx) — AppShell used to render a second, overlapping "Drop
+  // files to attach" banner here. Removed to avoid the duplicate; `dragging`
+  // is still accepted/plumbed through as `data-dragging` in case other
+  // chrome (CSS, e2e, future components) wants to key off drag-active state.
+  const dragActive = dragging && view === "chat";
+
+  const isDrawerOpen = belowDrawer && rail === "open";
+  const railWrapRef = React.useRef<HTMLDivElement>(null);
 
   const closeRail = React.useCallback((): void => {
     if (rail === "open") onRailChange("collapsed");
@@ -103,12 +71,24 @@ export function AppShell(props: AppShellProps) {
 
   const onKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>): void => {
-      if (e.key === "Escape" && effectivePanel === "float") {
+      if (e.key !== "Escape") return;
+      if (effectivePanel === "float") {
         onPanelChange("closed");
+      } else if (isDrawerOpen) {
+        onRailChange("collapsed");
       }
     },
-    [effectivePanel, onPanelChange],
+    [effectivePanel, onPanelChange, isDrawerOpen, onRailChange],
   );
+
+  // Move focus into the rail when the mobile drawer opens, so keyboard users
+  // land somewhere useful instead of on a scrim/background element.
+  React.useEffect(() => {
+    if (!isDrawerOpen) return;
+    const target =
+      railWrapRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+    target?.focus();
+  }, [isDrawerOpen]);
 
   return (
     <div
@@ -118,7 +98,7 @@ export function AppShell(props: AppShellProps) {
       data-panel={effectivePanel}
       data-rail={rail}
       data-drawer={belowDrawer ? "1" : "0"}
-      data-dragging={showDrop ? "1" : "0"}
+      data-dragging={dragActive ? "1" : "0"}
       onKeyDown={onKeyDown}
     >
       {/* mobile rail drawer scrim — AppShell-owned; LeftRail's own internals
@@ -130,25 +110,16 @@ export function AppShell(props: AppShellProps) {
         onClick={closeRail}
       />
 
-      <div className="rail-wrap">{leftRail}</div>
+      <div className="rail-wrap" ref={railWrapRef}>
+        {leftRail}
+      </div>
 
-      <div className="workspace">
+      {/* background content is inert while the drawer is open, so it isn't
+          tab-reachable behind the scrim */}
+      <div className="workspace" inert={isDrawerOpen || undefined}>
         {topBar}
         <div className="body">
-          <main className="main">
-            {main}
-            {showDrop ? (
-              <div
-                className="drop"
-                role="presentation"
-                data-testid="file-drop"
-                data-live="drag"
-              >
-                <DropIcon />
-                <span>Drop files to attach</span>
-              </div>
-            ) : null}
-          </main>
+          <main className="main">{main}</main>
           {showInspector ? (
             <div className="inspector-wrap" data-panel={effectivePanel}>
               {inspector}

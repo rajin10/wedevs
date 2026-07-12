@@ -146,6 +146,26 @@ describe("LeftRail", () => {
     expect(props.onChatAction).toHaveBeenCalledWith("r1", "delete");
   });
 
+  it("pinned rows keep the star indicator AND get the same keyboard-operable ⋯ menu", async () => {
+    const user = userEvent.setup();
+    const { props } = setup();
+    // r0 ("Q3 go-to-market plan") is the pinned fixture row — the star
+    // indicator (aria-hidden svg) must still render alongside the ChatIcon
+    // and the new menu trigger's DotsIcon (3 svgs total on the row).
+    const row = screen.getByText("Q3 go-to-market plan").closest("div")!;
+    expect(row.querySelectorAll("svg").length).toBe(3);
+    const trigger = screen.getByRole("button", {
+      name: /chat options for q3 go-to-market plan/i,
+    });
+    expect(trigger).toBeInTheDocument();
+    await user.click(trigger);
+    const menu = await screen.findByRole("menu");
+    await user.click(
+      within(menu).getByRole("menuitem", { name: /^archive$/i }),
+    );
+    expect(props.onChatAction).toHaveBeenCalledWith("r0", "archive");
+  });
+
   it("double-click a recent swaps to a rename Input; Enter commits via onRenameChat", async () => {
     const { props } = setup();
     const row = screen.getByText("Refactor auth middleware");
