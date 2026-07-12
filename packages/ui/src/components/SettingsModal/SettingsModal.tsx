@@ -370,7 +370,14 @@ export function SettingsModal({
                 <SetRow title="Display name" desc="Shown on shared chats.">
                   <Button variant="outline">Edit</Button>
                 </SetRow>
-                <SetRow title="Plan" desc="Pro — $30/mo · renews Aug 4.">
+                <SetRow
+                  title="Plan"
+                  desc={
+                    account
+                      ? `${account.plan} plan`
+                      : "Pro — $30/mo · renews Aug 4."
+                  }
+                >
                   <Button variant="outline">Manage</Button>
                 </SetRow>
               </div>
