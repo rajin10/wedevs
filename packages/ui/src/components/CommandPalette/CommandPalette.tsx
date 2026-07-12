@@ -13,15 +13,12 @@ import {
   CommandList,
   CommandShortcut,
 } from "../../primitives/command";
-import type { CommandItem as CommandItemData } from "../../types";
+import type {
+  CommandItem as CommandItemData,
+  CommandPaletteProps,
+} from "../../types";
 
-export interface CommandPaletteProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  actions: CommandItemData[];
-  recents: CommandItemData[];
-  models: CommandItemData[];
-}
+export type { CommandPaletteProps };
 
 // mockup 518–519: neutral base + active row = var(--hover)/var(--text). No accent anywhere.
 const ITEM_CLASS = cn(

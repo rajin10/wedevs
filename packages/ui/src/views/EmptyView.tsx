@@ -16,11 +16,14 @@ export function EmptyView({ greeting, starters, composer }: EmptyViewProps) {
       <div className="flex w-full max-w-[680px] flex-col items-center text-center">
         <Visor />
 
-        {/* eyebrow — dash rendered NEUTRAL per brand rule (mockup 215 tints it
-            accent; we deviate to --border-2 since it is not interactive/alive) */}
+        {/* eyebrow — dash tinted accent, matching mockup 215 and the
+            Inspector panes' live-surface treatment. */}
         <div className="mb-2 inline-flex items-center gap-[9px] text-[11px] font-bold uppercase tracking-[.18em] text-[var(--text-3)]">
-          <span className="h-0.5 w-5 rounded-sm bg-[var(--border-2)]" /> New
-          session
+          <span
+            data-live="eyebrow"
+            className="h-0.5 w-5 rounded-sm bg-[var(--accent)]"
+          />{" "}
+          New session
         </div>
 
         <h1 className="mb-2.5 font-[var(--font-display)] text-[34px] font-bold leading-[1.15] tracking-[-.02em] text-[var(--text)] max-[680px]:text-[27px]">
