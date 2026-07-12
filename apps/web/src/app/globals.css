@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* Tailwind v4 auto-detects only this app's files; the design-system components
+   live in the @wedevs/ui workspace package (consumed as raw TS via
+   transpilePackages), so their utility classes must be scanned explicitly or
+   none of packages/ui's styling is emitted. Path is relative to this file. */
+@source "../../../../packages/ui/src";
 @import "@wedevs/config/theme.css";
 @import "tw-animate-css";
 @import "@wedevs/ui/styles/keyframes.css";
