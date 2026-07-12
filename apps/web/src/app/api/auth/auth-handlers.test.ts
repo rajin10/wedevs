@@ -42,6 +42,7 @@ describe("callback GET (demo mode)", () => {
     expect(res.status).toBe(307);
     const location = res.headers.get("location")!;
     expect(location.endsWith("/app/settings")).toBe(true);
+    expect(new URL(location).origin).toBe("http://localhost");
     expect(jar.has("wedevs_demo_session")).toBe(true);
   });
 
@@ -65,5 +66,48 @@ describe("callback GET (demo mode)", () => {
     const location = new URL(res.headers.get("location")!);
     expect(location.origin).toBe("http://localhost");
     expect(location.pathname).toBe("/app");
+  });
+
+  // Bypass vectors: dot-segment paths that WHATWG URL normalization collapses
+  // to a leading "//", which a naive second `new URL(next, origin)` parse
+  // would then treat as protocol-relative and send off-site.
+  it("does NOT redirect off-site for a dot-segment ?next (/.//evil.example)", async () => {
+    jar.clear();
+    const req = new NextRequest(
+      new URL("http://localhost/auth/callback?next=/.//evil.example"),
+    );
+    const res = await callbackGET(req);
+    const location = new URL(res.headers.get("location")!);
+    expect(location.origin).toBe("http://localhost");
+  });
+
+  it("does NOT redirect off-site for a dot-segment ?next (/..//evil.example)", async () => {
+    jar.clear();
+    const req = new NextRequest(
+      new URL("http://localhost/auth/callback?next=/..//evil.example"),
+    );
+    const res = await callbackGET(req);
+    const location = new URL(res.headers.get("location")!);
+    expect(location.origin).toBe("http://localhost");
+  });
+
+  it("does NOT redirect off-site for a dot-segment ?next (/a/..//evil.example)", async () => {
+    jar.clear();
+    const req = new NextRequest(
+      new URL("http://localhost/auth/callback?next=/a/..//evil.example"),
+    );
+    const res = await callbackGET(req);
+    const location = new URL(res.headers.get("location")!);
+    expect(location.origin).toBe("http://localhost");
+  });
+
+  it("does NOT redirect off-site for a backslash ?next (/\\evil.example)", async () => {
+    jar.clear();
+    const req = new NextRequest(
+      new URL("http://localhost/auth/callback?next=/\\evil.example"),
+    );
+    const res = await callbackGET(req);
+    const location = new URL(res.headers.get("location")!);
+    expect(location.origin).toBe("http://localhost");
   });
 });
