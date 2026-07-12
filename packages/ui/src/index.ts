@@ -70,3 +70,22 @@ export { StreamShimmer } from "./live/StreamShimmer";
 export type { StreamShimmerProps } from "./live/StreamShimmer";
 export { TypeCaret } from "./live/TypeCaret";
 export type { TypeCaretProps } from "./live/TypeCaret";
+
+// views (main-column bodies)
+// NOTE: the view/data prop types (EmptyViewProps, ChatViewProps, ChatMessage,
+// StreamingMessage, ToolCardData, CodeViewProps, MarketViewProps,
+// PluginCardData) are already re-exported via `export * from "./types"`
+// above — not duplicated here.
+export { EmptyView } from "./views/EmptyView";
+export { ChatView } from "./views/ChatView";
+export { Thread } from "./views/Thread";
+export { Message } from "./views/Message";
+export { ToolCard } from "./views/ToolCard";
+export { CodeView } from "./views/CodeView";
+export { CodeEditor } from "./views/CodeEditor";
+export { MarketView } from "./views/MarketView";
+export { PluginCard } from "./views/PluginCard";
+export type { ThreadProps } from "./views/Thread";
+export type { MessageProps } from "./views/Message";
+export type { ToolCardProps } from "./views/ToolCard";
+export type { PluginCardProps } from "./views/PluginCard";
