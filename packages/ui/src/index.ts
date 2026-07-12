@@ -35,6 +35,8 @@ export {
 } from "./primitives/command";
 
 // components
+export { CommandPalette } from "./components/CommandPalette/CommandPalette";
+export type { CommandPaletteProps } from "./components/CommandPalette/CommandPalette";
 export { Composer } from "./components/Composer/Composer";
 export { Inspector } from "./components/Inspector/Inspector";
 export { LeftRail } from "./components/LeftRail/LeftRail";
