@@ -7,6 +7,8 @@ export type { ClassValue } from "clsx";
 export { useThemeStore, resolveTheme, THEME_STORAGE_KEY } from "./store/theme";
 export { ThemeProvider, useTheme } from "./providers/ThemeProvider";
 export type { ThemeProviderProps } from "./providers/ThemeProvider";
+export { ToastProvider, useToast } from "./providers/ToastProvider";
+export type { ToastContextValue } from "./providers/ToastProvider";
 
 // primitives
 export * from "./primitives/button";
@@ -48,6 +50,10 @@ export { ModelSelector } from "./components/TopBar/ModelSelector";
 // NOTE: ModelOption / AgentOption / ModelSelectorProps / TopBarProps are
 // already re-exported via `export * from "./types"` above — re-exporting
 // them again here would collide (duplicate export of the same binding).
+export { Toast } from "./components/Toast/Toast";
+// NOTE: ToastProps is already re-exported via `export * from "./types"`
+// above (same pattern as ModelSelectorProps/TopBarProps) — re-exporting it
+// again here would collide (duplicate export of the same binding).
 
 // mascots
 export { Robo } from "./mascots/Robo";
