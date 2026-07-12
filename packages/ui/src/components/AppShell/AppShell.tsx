@@ -138,7 +138,12 @@ export function AppShell(props: AppShellProps) {
           <main className="main">
             {main}
             {showDrop ? (
-              <div className="drop" role="presentation" data-testid="file-drop">
+              <div
+                className="drop"
+                role="presentation"
+                data-testid="file-drop"
+                data-live="drag"
+              >
                 <DropIcon />
                 <span>Drop files to attach</span>
               </div>
