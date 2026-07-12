@@ -285,4 +285,49 @@ describe("Volt audit — accent appears on no non-alive element", () => {
       ).toBe(true);
     }
   });
+
+  it("every accent-classed element stays sanctioned on the empty screen", () => {
+    useUIStore.setState({ view: "empty" });
+    const { container } = renderShell();
+
+    const accentEls = Array.from(
+      container.querySelectorAll<HTMLElement>('[class*="accent"]'),
+    ).filter(paintsAccentUnconditionally);
+
+    // The eyebrow dash (data-live="eyebrow") is a sanctioned accent surface
+    // on this screen — proves the audit is seeing real accent usage here too.
+    expect(accentEls.length).toBeGreaterThan(0);
+
+    for (const el of accentEls) {
+      const sanctioned = el.matches(ALLOWED) || el.closest(ALLOWED) !== null;
+      expect(
+        sanctioned,
+        `accent used on non-alive element: <${el.tagName.toLowerCase()} class="${el.className}">`,
+      ).toBe(true);
+    }
+  });
+
+  it.each(["file", "details", "config"] as const)(
+    "every accent-classed element stays sanctioned on the code screen (Inspector tab=%s)",
+    (inspectorTab) => {
+      useUIStore.setState({
+        view: "code",
+        panel: "float",
+        inspectorTab,
+      });
+      const { container } = renderShell();
+
+      const accentEls = Array.from(
+        container.querySelectorAll<HTMLElement>('[class*="accent"]'),
+      ).filter(paintsAccentUnconditionally);
+
+      for (const el of accentEls) {
+        const sanctioned = el.matches(ALLOWED) || el.closest(ALLOWED) !== null;
+        expect(
+          sanctioned,
+          `accent used on non-alive element: <${el.tagName.toLowerCase()} class="${el.className}">`,
+        ).toBe(true);
+      }
+    },
+  );
 });

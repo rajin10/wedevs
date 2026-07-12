@@ -42,3 +42,46 @@ describe("RootLayout font wiring", () => {
     expect(html).not.toMatch(/<link[^>]+fonts\.google/i);
   });
 });
+
+describe("anti-FOUC theme script", () => {
+  it("renders a blocking inline <head> script that stamps data-theme from the persisted mode", () => {
+    expect(html).toContain("<script");
+    expect(html).toContain("wedevs-theme");
+    expect(html).toContain("data-theme");
+    expect(html).toContain("prefers-color-scheme: dark");
+  });
+
+  it("resolves and stamps data-theme synchronously in a browser-like DOM", () => {
+    const KEY = "wedevs-theme";
+    // Extract the exact script text RootLayout emitted (not a hand-copied
+    // duplicate) so this test exercises the real blocking script.
+    const match = /<script[^>]*>([\s\S]*?)<\/script>/.exec(html);
+    expect(match).not.toBeNull();
+    const script = match![1]!;
+
+    // explicit "dark" mode persisted, even though the OS prefers light —
+    // the script must honor the STORED mode, not the OS.
+    window.localStorage.setItem(KEY, "dark");
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: false, // OS prefers light
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })) as unknown as typeof window.matchMedia;
+    document.documentElement.removeAttribute("data-theme");
+
+    // Exercising the exact blocking script string emitted into <head>.
+    (0, eval)(script);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+
+    window.localStorage.removeItem(KEY);
+    window.matchMedia = originalMatchMedia;
+    document.documentElement.removeAttribute("data-theme");
+  });
+});

@@ -129,6 +129,11 @@ export function Composer({
   }, [value]);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    // Guard against IME composition (e.g. Japanese/Chinese/Korean input
+    // methods): the Enter that confirms a composed character must not also
+    // submit the message. `keyCode === 229` is the legacy fallback some
+    // browsers still report during composition.
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     // Enter (also Ctrl/Cmd+Enter) submits; Shift+Enter inserts a newline.
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

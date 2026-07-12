@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Composer } from "./Composer";
 import type { Attachment } from "../../types";
@@ -79,6 +79,20 @@ describe("Composer", () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(1);
     await user.keyboard("{Shift>}{Enter}{/Shift}");
     expect(props.onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it("Enter during IME composition does not submit (isComposing)", () => {
+    const { props } = renderComposer();
+    const textarea = screen.getByRole("textbox");
+    fireEvent.keyDown(textarea, { key: "Enter", isComposing: true });
+    expect(props.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("Enter with the legacy IME keyCode 229 does not submit", () => {
+    const { props } = renderComposer();
+    const textarea = screen.getByRole("textbox");
+    fireEvent.keyDown(textarea, { key: "Enter", keyCode: 229 });
+    expect(props.onSubmit).not.toHaveBeenCalled();
   });
 
   it("Ctrl+Enter also submits", async () => {
