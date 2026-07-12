@@ -37,6 +37,11 @@ export {
 // components
 export { LeftRail } from "./components/LeftRail/LeftRail";
 export type { LeftRailProps } from "./components/LeftRail/LeftRail";
+export { TopBar } from "./components/TopBar/TopBar";
+export { ModelSelector } from "./components/TopBar/ModelSelector";
+// NOTE: ModelOption / AgentOption / ModelSelectorProps / TopBarProps are
+// already re-exported via `export * from "./types"` above — re-exporting
+// them again here would collide (duplicate export of the same binding).
 
 // mascots
 export { Robo } from "./mascots/Robo";
