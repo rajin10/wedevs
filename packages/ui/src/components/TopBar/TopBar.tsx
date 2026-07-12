@@ -49,9 +49,11 @@ export function TopBar({
     setDraft(title);
     setEditing(true);
   };
-  // mockup 1471-1473: done(value.trim() || old)
+  // mockup 1471-1473: done(value.trim() || old). Guarded (mirrors LeftRail's
+  // commitRename) so a blank/no-op edit doesn't fire onTitleChange at all.
   const commit = () => {
-    onTitleChange(draft.trim() || title);
+    const next = draft.trim();
+    if (next && next !== title) onTitleChange(next);
     setEditing(false);
   };
   const cancel = () => {
@@ -61,21 +63,25 @@ export function TopBar({
 
   return (
     <header className="flex h-14 flex-none items-center gap-2.5 border-b border-[var(--border)] bg-[var(--bg)] px-3.5">
-      {/* mockup 807-809: rail-open hamburger */}
+      {/* mockup 807-809: rail-open hamburger — mobile drawer trigger only;
+          desktop has LeftRail's own collapse button. */}
       <Button
         variant="icon"
         type="button"
         aria-label="Open menu"
         onClick={onRailOpen}
+        className="hidden max-[900px]:flex"
       >
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* mockup 811-817: model/agent selector */}
-      <ModelSelector variant="topbar" {...selector} />
+      {/* mockup 811-817: model/agent selector — TopBar's own variant always
+          wins over anything the caller spreads in via `selector`. */}
+      <ModelSelector {...selector} variant="topbar" />
 
-      {/* mockup 875-880: center inline-editable session title */}
-      <div className="flex min-w-0 flex-1 justify-center">
+      {/* mockup 875-880/725: center inline-editable session title, hidden
+          below 680px */}
+      <div className="flex min-w-0 flex-1 justify-center max-[680px]:hidden">
         {editing ? (
           <input
             ref={inputRef}
@@ -92,6 +98,7 @@ export function TopBar({
             }}
             onBlur={commit}
             aria-label="Session title"
+            data-live="rename"
             className="min-w-0 max-w-full rounded-md border border-[var(--accent-line)] bg-[var(--surface)] px-[7px] py-0.5 text-sm text-[var(--text)] outline-none"
           />
         ) : (
@@ -121,7 +128,7 @@ export function TopBar({
           className="gap-[7px] px-3 py-[7px] text-[13px] font-semibold"
         >
           <Share2 className="h-4 w-4" />
-          <span>Share</span>
+          <span className="max-[680px]:hidden">Share</span>
         </Button>
 
         <Button

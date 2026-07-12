@@ -138,12 +138,22 @@ describe("TopBar", () => {
     expect(props.onTitleChange).toHaveBeenCalledWith("Blurred title");
   });
 
-  it("keeps the previous title when committing an empty value", () => {
+  it("empty rename falls back to old title (no-op — onTitleChange not fired)", () => {
     const { props } = setup();
     fireEvent.click(screen.getByRole("button", { name: "Rename session" }));
     const input = screen.getByRole("textbox", { name: "Session title" });
     fireEvent.change(input, { target: { value: "   " } });
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(props.onTitleChange).toHaveBeenCalledWith("Q3 go-to-market plan");
+    expect(props.onTitleChange).not.toHaveBeenCalled();
+    expect(screen.getByText("Q3 go-to-market plan")).toBeInTheDocument();
+  });
+
+  it("re-committing the same (unchanged) title is a no-op — onTitleChange not fired", () => {
+    const { props } = setup();
+    fireEvent.click(screen.getByRole("button", { name: "Rename session" }));
+    const input = screen.getByRole("textbox", { name: "Session title" });
+    fireEvent.change(input, { target: { value: "Q3 go-to-market plan" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(props.onTitleChange).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,4 @@
 "use client";
-import * as React from "react";
 import {
   AppShell,
   LeftRail,
@@ -14,6 +13,8 @@ import {
   MarketView,
   useTheme,
   useToast,
+  useMediaQuery,
+  INSPECTOR_PIN_QUERY,
 } from "@wedevs/ui";
 import type {
   ComposerProps,
@@ -35,50 +36,21 @@ type JumpPreset =
   | "settings"
   | "selector";
 
-/**
- * SSR-safe media-query subscription mirroring AppShell's own internal
- * `useMediaQuery` (Task 14, AppShell.tsx). AppShell is an opaque geometry
- * component and never reaches into the `inspector` node it's given, so this
- * page must independently compute the SAME "pinned -> overlay below 1180px"
- * reflow AppShell applies to its `.inspector-wrap` container, and pass that
- * *effective* mode into <Inspector/> so the component's own internal width
- * classing (`modeClass` in Inspector.tsx) stays in sync with the wrapper
- * geometry AppShell renders around it (binding reconciliation #3).
- */
-function useMediaQuery(query: string): boolean {
-  const subscribe = React.useCallback(
-    (onChange: () => void): (() => void) => {
-      if (
-        typeof window === "undefined" ||
-        typeof window.matchMedia !== "function"
-      ) {
-        return () => {};
-      }
-      const mql = window.matchMedia(query);
-      mql.addEventListener("change", onChange);
-      return () => mql.removeEventListener("change", onChange);
-    },
-    [query],
-  );
-  const getSnapshot = React.useCallback((): boolean => {
-    if (
-      typeof window === "undefined" ||
-      typeof window.matchMedia !== "function"
-    )
-      return false;
-    return window.matchMedia(query).matches;
-  }, [query]);
-  const getServerSnapshot = React.useCallback((): boolean => false, []);
-  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
 export default function ShellPage() {
   const s = useUIStore();
   const theme = useTheme();
   const toast = useToast();
 
-  // Same breakpoint AppShell.tsx uses for the pinned -> float reflow.
-  const belowPin = useMediaQuery("(max-width: 1180px)");
+  // AppShell is an opaque geometry component and never reaches into the
+  // `inspector` node it's given, so this page must independently compute
+  // the SAME "pinned -> overlay below 1180px" reflow AppShell applies to its
+  // `.inspector-wrap` container, and pass that *effective* mode into
+  // <Inspector/> so the component's own internal width classing
+  // (`modeClass` in Inspector.tsx) stays in sync with the wrapper geometry
+  // AppShell renders around it (binding reconciliation #3). `useMediaQuery`
+  // + `INSPECTOR_PIN_QUERY` are the shared single source of truth for this
+  // breakpoint — see packages/ui/src/lib/use-media-query.ts.
+  const belowPin = useMediaQuery(INSPECTOR_PIN_QUERY);
   const effectivePanel: PanelMode =
     s.panel === "pinned" && belowPin ? "float" : s.panel;
 

@@ -21,7 +21,7 @@ const modeClass: Record<InspectorProps["mode"], string> = {
   closed: "w-0 overflow-hidden border-l border-[var(--border)]",
   pinned: "w-[400px] border-l border-[var(--border)]",
   float:
-    "absolute inset-y-0 right-0 z-30 w-[390px] border-l border-[var(--border-2)] shadow-[var(--shadow)]",
+    "absolute inset-y-0 right-0 z-30 w-[390px] max-[680px]:w-full max-[680px]:left-0 border-l border-[var(--border-2)] shadow-[var(--shadow)]",
 };
 
 // mockup 397-399: neutral tab chip; active = --active/--text (NO accent)
