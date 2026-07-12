@@ -227,6 +227,7 @@ export interface SettingsModalProps {
   onPaneChange: (pane: SettingsPane) => void;
   themeMode: ThemeMode;
   onThemeChange: (mode: ThemeMode) => void;
+  account?: Account; // optional: real account for the Account pane
 }
 export interface ToastProps {
   message: string | null;

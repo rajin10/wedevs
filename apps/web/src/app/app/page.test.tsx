@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
@@ -8,7 +8,24 @@ import {
   resolveTheme,
 } from "@wedevs/ui";
 import { useUIStore, initialUIState } from "@/store/ui";
+import { SessionProvider } from "@/components/session-provider";
+import type { SessionUser } from "@/lib/auth/types";
+
+const pushMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: pushMock }),
+}));
+
 import ShellPage from "./page";
+
+const sessionUser: SessionUser = {
+  id: "u1",
+  email: "hasib.webdev@gmail.com",
+  name: "Hasib Rahman",
+  initials: "HR",
+  avatarUrl: null,
+  plan: "pro",
+};
 
 function setMatchMedia(reduceMotion: boolean, systemDark: boolean) {
   window.matchMedia = ((query: string) => ({
@@ -29,16 +46,19 @@ function setMatchMedia(reduceMotion: boolean, systemDark: boolean) {
 
 function renderShell() {
   return render(
-    <ThemeProvider>
-      <ToastProvider>
-        <ShellPage />
-      </ToastProvider>
-    </ThemeProvider>,
+    <SessionProvider user={sessionUser}>
+      <ThemeProvider>
+        <ToastProvider>
+          <ShellPage />
+        </ToastProvider>
+      </ThemeProvider>
+    </SessionProvider>,
   );
 }
 
 beforeEach(() => {
   cleanup();
+  pushMock.mockClear();
   localStorage.clear();
   setMatchMedia(false, true); // motion allowed, system=dark
   useUIStore.setState(initialUIState);
