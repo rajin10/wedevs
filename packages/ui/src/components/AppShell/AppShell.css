@@ -1,0 +1,150 @@
+/* AppShell — shell geometry & state machine.
+   Ported from mockup/index.html: 96 (.app), 165-204 (.workspace/.body/.main),
+   345-349 (.drop), 388-393 (Inspector container), 710/714-722 (rail drawer),
+   723-728 (Inspector full-screen sheet).
+
+   DEVIATION FROM THE RAW MOCKUP CSS: the mockup targets its own semantic
+   classes (`.rail`, `.rail-open-btn`, `.brand-name`, `.lbl`, `.grp-h`,
+   `.acct-meta`, `.list-scroll`, ...) because every region shares one
+   stylesheet there. In this port, LeftRail (Task 8) and Inspector (Task 12)
+   are Tailwind-utility components — they carry no such classes, only their
+   OWN `data-rail`/`data-panel` attributes on their OWN root element, and
+   they already self-manage their internal collapse from the `mode` prop
+   the parent gives them (e.g. LeftRail renders full-width/expanded for any
+   `mode !== "collapsed"`, so a rail opened as a mobile drawer with
+   mode="open" already shows its labels — no CSS un-hide needed). So
+   AppShell never targets a child class or child internals: it wraps
+   `leftRail`/`inspector` in its OWN `.rail-wrap` / `.inspector-wrap`
+   containers and keys ALL geometry off data-* attributes AppShell itself
+   stamps on `.app`. The 1180/900 collapses are JS-driven
+   (data-panel/data-drawer), not media queries — see AppShell.tsx's
+   useMediaQuery. Only the purely-visual full-screen-sheet tightening at
+   680px stays a real CSS media query. */
+
+.app {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+/* workspace = topbar + body (mockup 165-204) */
+.workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+}
+.body {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+}
+/* neutral ambient glow — --hover, never accent (mockup 203-204) */
+.main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    880px 440px at 50% -8%,
+    var(--hover),
+    transparent 60%
+  );
+}
+
+/* Rail wrapper — AppShell-owned. LeftRail's own internals (brand, nav,
+   account chip) and its 266<->60 collapse belong to LeftRail (Task 8);
+   AppShell owns only the mobile off-canvas drawer transform. */
+.rail-wrap {
+  flex: 0 0 auto;
+}
+.app[data-drawer="1"] .rail-wrap {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 60;
+  transform: translateX(-100%);
+  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.app[data-drawer="1"][data-rail="open"] .rail-wrap {
+  transform: translateX(0);
+  box-shadow: var(--shadow);
+}
+
+/* mobile rail scrim — click-to-close (mockup 714-722) */
+.rail-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 14, 0.5);
+  z-index: 39;
+  display: none;
+}
+.app[data-drawer="1"][data-rail="open"] .rail-scrim {
+  display: block;
+}
+
+/* Inspector wrapper — AppShell-owned container geometry per data-panel
+   (mockup 388-393). Internals (.insp-head/.insp-tabs/panes) are owned by
+   Inspector (Task 12); it is conditionally mounted, so there is no
+   data-panel="closed" width:0 rule here (see AppShell.tsx). */
+.inspector-wrap {
+  flex: 0 0 auto;
+}
+.app[data-panel="pinned"] .inspector-wrap {
+  width: 400px;
+}
+.app[data-panel="float"] .inspector-wrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 390px;
+  z-index: 30;
+}
+
+/* file-drop overlay — sanctioned drag-active accent affordance (mockup 345-349) */
+.drop {
+  position: absolute;
+  inset: 8px 24px;
+  border-radius: 18px;
+  border: 2px dashed var(--accent-line);
+  background: var(--accent-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  z-index: 5;
+  backdrop-filter: blur(2px);
+}
+
+/* full-screen Inspector sheet on very narrow viewports (mockup 723-728).
+   Below 680 the panel is already "float" (JS forced it below 1180). */
+@media (max-width: 680px) {
+  .app[data-panel="float"] .inspector-wrap {
+    width: 100% !important;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* reduced motion — global guard also applies; disable shell transitions locally too */
+@media (prefers-reduced-motion: reduce) {
+  .rail-wrap {
+    transition: none;
+  }
+}

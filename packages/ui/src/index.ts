@@ -37,6 +37,11 @@ export {
 } from "./primitives/command";
 
 // components
+export { AppShell } from "./components/AppShell/AppShell";
+// NOTE: AppShellProps is already re-exported via `export * from "./types"`
+// above (same pattern as ModelSelectorProps/TopBarProps/ToastProps) —
+// re-exporting it again here would collide (duplicate export of the same
+// binding).
 export { CommandPalette } from "./components/CommandPalette/CommandPalette";
 export type { CommandPaletteProps } from "./components/CommandPalette/CommandPalette";
 export { Composer } from "./components/Composer/Composer";
