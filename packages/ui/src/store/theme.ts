@@ -3,6 +3,8 @@
 import { create } from "zustand";
 import type { ThemeMode, ResolvedTheme, ThemeState } from "../types";
 
+export type { ThemeMode };
+
 /** localStorage key holding the user's ThemeMode choice. */
 export const THEME_STORAGE_KEY = "wedevs-theme";
 

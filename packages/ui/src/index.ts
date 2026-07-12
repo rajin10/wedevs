@@ -41,6 +41,8 @@ export { Composer } from "./components/Composer/Composer";
 export { Inspector } from "./components/Inspector/Inspector";
 export { LeftRail } from "./components/LeftRail/LeftRail";
 export type { LeftRailProps } from "./components/LeftRail/LeftRail";
+export { SettingsModal } from "./components/SettingsModal/SettingsModal";
+export type { SettingsModalProps } from "./components/SettingsModal/SettingsModal";
 export { TopBar } from "./components/TopBar/TopBar";
 export { ModelSelector } from "./components/TopBar/ModelSelector";
 // NOTE: ModelOption / AgentOption / ModelSelectorProps / TopBarProps are

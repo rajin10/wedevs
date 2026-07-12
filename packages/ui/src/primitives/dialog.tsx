@@ -27,8 +27,13 @@ DialogOverlay.displayName = "DialogOverlay";
 
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    /** Show the primitive's built-in top-right close X. Defaults to true; set
+     *  false when the consumer renders its own close affordance (e.g. SettingsModal's
+     *  pane-header close button). */
+    showCloseButton?: boolean;
+  }
+>(({ className, children, showCloseButton = true, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -45,16 +50,18 @@ export const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close
-        className={cn(
-          "absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-[var(--radius-xs)] " +
-            "text-[var(--text-3)] outline-none transition-colors hover:bg-[var(--hover)] hover:text-[var(--text)] " +
-            "focus-visible:ring-2 focus-visible:ring-[var(--accent-line)]",
-        )}
-        aria-label="Close"
-      >
-        <X className="h-4 w-4" />
-      </DialogPrimitive.Close>
+      {showCloseButton && (
+        <DialogPrimitive.Close
+          className={cn(
+            "absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-[var(--radius-xs)] " +
+              "text-[var(--text-3)] outline-none transition-colors hover:bg-[var(--hover)] hover:text-[var(--text)] " +
+              "focus-visible:ring-2 focus-visible:ring-[var(--accent-line)]",
+          )}
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </DialogPrimitive.Close>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
