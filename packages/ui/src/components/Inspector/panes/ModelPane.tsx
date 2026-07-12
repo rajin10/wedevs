@@ -8,7 +8,10 @@ import type { ModelDetails } from "../../../types";
 function EyebrowSm({ label }: { label: string }) {
   return (
     <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--text-3)]">
-      <span className="h-0.5 w-4 flex-none rounded-[2px] bg-[var(--accent)]" />
+      <span
+        data-live="eyebrow"
+        className="h-0.5 w-4 flex-none rounded-[2px] bg-[var(--accent)]"
+      />
       {label}
     </div>
   );
@@ -29,6 +32,7 @@ function Range({
     <div className="relative h-[5px] rounded-[3px] bg-[var(--border-2)]">
       <div
         data-testid="range-fill"
+        data-live="range"
         className="absolute inset-y-0 left-0 rounded-[3px] bg-[var(--accent)]"
         style={{ width: `${pct}%` }}
       />

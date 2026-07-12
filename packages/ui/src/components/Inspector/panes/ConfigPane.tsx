@@ -24,7 +24,10 @@ function EyebrowSm({
         (className ?? "")
       }
     >
-      <span className="h-0.5 w-4 flex-none rounded-[2px] bg-[var(--accent)]" />
+      <span
+        data-live="eyebrow"
+        className="h-0.5 w-4 flex-none rounded-[2px] bg-[var(--accent)]"
+      />
       {label}
     </div>
   );
