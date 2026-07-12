@@ -43,3 +43,14 @@ export function decodeDemoSession(raw: string | undefined): SessionUser | null {
     return null;
   }
 }
+
+// Shared attributes for the demo-session cookie. One source so the policy
+// (e.g. adding `secure` for the HTTPS deploy) can't drift between the routes
+// that set it. httpOnly so client JS can't read it; lax for top-level nav.
+export const DEMO_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+export const demoCookieOptions = {
+  httpOnly: true as const,
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: DEMO_COOKIE_MAX_AGE,
+};

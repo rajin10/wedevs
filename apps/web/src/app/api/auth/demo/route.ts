@@ -4,9 +4,8 @@ import {
   DEMO_COOKIE,
   DEMO_USER,
   encodeDemoSession,
+  demoCookieOptions,
 } from "@/lib/auth/demo-session";
-
-const THIRTY_DAYS = 60 * 60 * 24 * 30;
 
 // Demo sign-in: sets the (unsigned, non-security-boundary) demo cookie so the
 // signed-in experience is reachable without a backend. Replaced by real
@@ -14,11 +13,6 @@ const THIRTY_DAYS = 60 * 60 * 24 * 30;
 // demo mode.
 export async function POST() {
   const store = await cookies();
-  store.set(DEMO_COOKIE, encodeDemoSession(DEMO_USER), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: THIRTY_DAYS,
-  });
+  store.set(DEMO_COOKIE, encodeDemoSession(DEMO_USER), demoCookieOptions);
   return NextResponse.json({ ok: true });
 }
