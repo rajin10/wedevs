@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured } from "@/lib/auth/config";
-import { DEMO_COOKIE } from "@/lib/auth/constants"; // Buffer-free — Edge-safe
+import { DEMO_COOKIE, demoCookieLooksValid } from "@/lib/auth/constants"; // Buffer-free — Edge-safe
 import { authRedirect } from "@/lib/auth/redirect";
 
 // Edge middleware — must not import Node Buffer/crypto. It only needs to know
@@ -27,9 +27,16 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  const hasSession = req.cookies.has(DEMO_COOKIE);
+  const value = req.cookies.get(DEMO_COOKIE)?.value;
+  const hasSession = demoCookieLooksValid(value);
   const to = authRedirect({ pathname, hasSession });
-  if (to) return NextResponse.redirect(new URL(to, req.url));
+  if (to) {
+    const res = NextResponse.redirect(new URL(to, req.url));
+    // Self-heal: a present-but-undecodable cookie would otherwise loop
+    // (middleware "has session" vs layout requireUser "no user").
+    if (value && !hasSession) res.cookies.delete(DEMO_COOKIE);
+    return res;
+  }
   return NextResponse.next();
 }
 
