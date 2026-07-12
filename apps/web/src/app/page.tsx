@@ -52,9 +52,14 @@ export default function Home() {
               <LiveDot className="ml-[6px]" />
             </span>
           </div>
-          <Button asChild variant="primary">
-            <Link href="/app">Open app</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="ghost">
+              <Link href="/login">Log in</Link>
+            </Button>
+            <Button asChild variant="primary">
+              <Link href="/app">Open app</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
