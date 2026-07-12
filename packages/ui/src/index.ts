@@ -36,6 +36,7 @@ export {
 
 // components
 export { Composer } from "./components/Composer/Composer";
+export { Inspector } from "./components/Inspector/Inspector";
 export { LeftRail } from "./components/LeftRail/LeftRail";
 export type { LeftRailProps } from "./components/LeftRail/LeftRail";
 export { TopBar } from "./components/TopBar/TopBar";
