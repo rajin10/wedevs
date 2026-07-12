@@ -35,6 +35,7 @@ export {
 } from "./primitives/command";
 
 // components
+export { Composer } from "./components/Composer/Composer";
 export { LeftRail } from "./components/LeftRail/LeftRail";
 export type { LeftRailProps } from "./components/LeftRail/LeftRail";
 export { TopBar } from "./components/TopBar/TopBar";
