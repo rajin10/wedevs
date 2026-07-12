@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -9,9 +9,19 @@ vi.mock("next/navigation", () => ({
 
 import LoginPage from "./login/page";
 
+beforeEach(() => {
+  // The demo path now POSTs /api/auth/demo before routing — stub fetch so
+  // these pre-existing routing assertions keep passing without a backend.
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) })),
+  );
+});
+
 afterEach(() => {
   cleanup();
   pushMock.mockClear();
+  vi.unstubAllGlobals();
 });
 
 describe("Login page", () => {

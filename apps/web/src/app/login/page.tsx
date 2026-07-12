@@ -1,26 +1,20 @@
 "use client";
 
 // Public sign-in page — the middle leg of the flow: landing (`/`) -> login
-// (`/login`) -> workspace (`/app`). Real auth is NOT wired yet (a Supabase
-// project is pending), so this renders the full sign-in UI plus a working
-// DEMO path — every action below routes straight into `/app` so the flow is
-// reviewable end-to-end today, with no dead ends.
-//
-// Where the real `@supabase/ssr` calls go once the project exists:
-//   - `handleEmailSubmit` below -> replace the demo `router.push("/app")`
-//     with `await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })`
-//     and swap the redirect for a "check your email" state.
-//   - `handleOAuth(provider)` below -> replace the demo `router.push("/app")`
-//     with `await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } })`,
-//     which performs its own redirect (the manual `router.push` goes away).
-// No `@supabase/*` package is imported here — the build stays clean until
-// the Supabase project is actually provisioned.
+// (`/login`) -> workspace (`/app`). It works in TWO modes off one seam
+// (isSupabaseConfigured):
+//   • Demo mode (no Supabase env): every action establishes a demo session by
+//     POSTing /api/auth/demo, then routes to /app — the flow is reviewable
+//     end-to-end with no backend and no dead ends.
+//   • Supabase mode: email → signInWithOtp (magic link); Google/GitHub →
+//     signInWithOAuth (provider redirect, returns via /auth/callback).
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Input, LiveDot } from "@wedevs/ui";
 import { Github } from "lucide-react";
+import { isSupabaseConfigured } from "@/lib/auth/config";
 
 // Simple inline, brand-neutral glyph (no lucide equivalent for Google).
 // Monochrome via `currentColor` — no hardcoded hex, inherits the outline
@@ -45,18 +39,43 @@ function GoogleGlyph() {
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
 
-  function handleEmailSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    // DEMO: no real auth yet — see the comment block above for the
-    // `signInWithOtp` call that replaces this once Supabase is wired up.
+  async function establishDemoSession() {
+    await fetch("/api/auth/demo", { method: "POST" });
     router.push("/app");
   }
 
-  function handleOAuth() {
-    // DEMO: no real auth yet — see the comment block above for the
-    // `signInWithOAuth` call that replaces this once Supabase is wired up.
-    router.push("/app");
+  async function handleEmailSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isSupabaseConfigured()) {
+      const { createSupabaseBrowserClient } =
+        await import("@/lib/auth/supabase/client");
+      const supabase = createSupabaseBrowserClient();
+      await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      setSent(true);
+      return;
+    }
+    await establishDemoSession();
+  }
+
+  async function handleOAuth(provider: "google" | "github") {
+    if (isSupabaseConfigured()) {
+      const { createSupabaseBrowserClient } =
+        await import("@/lib/auth/supabase/client");
+      const supabase = createSupabaseBrowserClient();
+      await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      return; // provider performs its own redirect
+    }
+    await establishDemoSession();
   }
 
   return (
@@ -93,6 +112,12 @@ export default function LoginPage() {
           Pick up right where you left off — no account required for the demo.
         </p>
 
+        {sent && (
+          <p className="mb-4 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[13px] text-[var(--text-2)]">
+            Check your email for a magic link to finish signing in.
+          </p>
+        )}
+
         <form onSubmit={handleEmailSubmit} className="flex flex-col gap-2">
           <label
             htmlFor="email"
@@ -125,7 +150,7 @@ export default function LoginPage() {
             type="button"
             variant="outline"
             className="w-full"
-            onClick={handleOAuth}
+            onClick={() => handleOAuth("google")}
           >
             <GoogleGlyph />
             Continue with Google
@@ -134,7 +159,7 @@ export default function LoginPage() {
             type="button"
             variant="outline"
             className="w-full"
-            onClick={handleOAuth}
+            onClick={() => handleOAuth("github")}
           >
             <Github size={16} strokeWidth={1.75} aria-hidden="true" />
             Continue with GitHub
