@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import {
   AppShell,
   LeftRail,
@@ -24,6 +25,8 @@ import type {
   PanelMode,
 } from "@wedevs/ui";
 import { useUIStore } from "@/store/ui";
+import { useSession } from "@/components/session-provider";
+import { sessionToAccount } from "@/lib/auth/account";
 import * as fx from "./fixtures";
 
 type JumpPreset =
@@ -40,6 +43,9 @@ export default function ShellPage() {
   const s = useUIStore();
   const theme = useTheme();
   const toast = useToast();
+  const router = useRouter();
+  const session = useSession();
+  const account = sessionToAccount(session);
 
   // AppShell is an opaque geometry component and never reaches into the
   // `inspector` node it's given, so this page must independently compute
@@ -232,7 +238,7 @@ export default function ShellPage() {
       activeNav={s.activeNav}
       recents={fx.recents}
       projects={fx.projects}
-      account={fx.account}
+      account={account}
       onNavSelect={s.selectNav}
       onNewChat={s.newChat}
       onSearch={() => s.setPaletteOpen(true)}
@@ -241,7 +247,11 @@ export default function ShellPage() {
       onChatAction={() => {}}
       onAccountAction={(action) => {
         if (action === "settings") s.setSettingsOpen(true);
-        else if (action === "logout") toast.show("Signed out (demo)");
+        else if (action === "logout") {
+          void fetch("/api/auth/signout", { method: "POST" }).then(() => {
+            router.push("/login");
+          });
+        }
       }}
     />
   );
@@ -316,6 +326,7 @@ export default function ShellPage() {
         onPaneChange={s.setSettingsPane}
         themeMode={theme.mode}
         onThemeChange={theme.setMode}
+        account={account}
       />
 
       {/* demo dev-bar — the one accent-glow-allowed surface (mock-dev-bar). */}

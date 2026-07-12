@@ -235,6 +235,7 @@ export function SettingsModal({
   onPaneChange,
   themeMode,
   onThemeChange,
+  account,
 }: SettingsModalProps) {
   // Local demo state for controls not lifted to props.
   const [accent, setAccent] = React.useState("Slate");
@@ -354,11 +355,15 @@ export function SettingsModal({
                 <SetRow
                   leading={
                     <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[var(--active)] text-lg font-semibold">
-                      AK
+                      {account?.initials ?? "AK"}
                     </div>
                   }
-                  title="Ayesha Khan"
-                  desc="ayesha@company.com · Pro workspace"
+                  title={account?.name ?? "Ayesha Khan"}
+                  desc={
+                    account
+                      ? `${account.email} · ${account.plan} workspace`
+                      : "ayesha@company.com · Pro workspace"
+                  }
                 >
                   <Button variant="outline">Change</Button>
                 </SetRow>
