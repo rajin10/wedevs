@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { DEMO_USER, encodeDemoSession } from "./demo-session";
 
+// Next.js's webpack build aliases the "server-only" marker package to a no-op
+// when compiling for the server, and to the real (throwing) package when
+// compiling for the client — that's what makes it a build-time guard. Vitest
+// has no equivalent aliasing, so the real package throws unconditionally.
+// Stub it here so this file's server-only-gated import (./server) loads
+// under test; this is test-infra only and has no effect on prod builds.
+vi.mock("server-only", () => ({}));
+
 const cookieStore = new Map<string, string>();
 vi.mock("next/headers", () => ({
   cookies: async () => ({
