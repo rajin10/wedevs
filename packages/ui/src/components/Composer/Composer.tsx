@@ -62,6 +62,7 @@ function Chip({
       {progress !== null ? (
         <span
           data-testid="chip-progress"
+          data-live="progress"
           className="absolute bottom-0 left-0 h-0.5 rounded-[2px] bg-[var(--accent)]"
           style={{ width: `${progress}%` }}
         />
@@ -85,6 +86,7 @@ function DropOverlay({ reduced }: { reduced: boolean }) {
   return (
     <div
       data-testid="drop-overlay"
+      data-live="drag"
       className={cn(
         "absolute inset-x-6 inset-y-2 z-[5] flex flex-col items-center justify-center gap-2.5",
         "rounded-[18px] border-2 border-dashed border-[var(--accent-line)] bg-[var(--accent-soft)]",
@@ -202,6 +204,7 @@ export function Composer({
                 type="button"
                 aria-label="Tools and plugins"
                 aria-pressed={toolsOn}
+                data-live={toolsOn ? "toggle" : undefined}
                 title="Tools & plugins"
                 onClick={onToggleTools}
                 className={cn(
