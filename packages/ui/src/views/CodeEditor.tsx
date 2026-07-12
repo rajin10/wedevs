@@ -79,8 +79,11 @@ export function CodeEditor() {
           </div>
         </div>
 
-        {/* AI live-edit bar — sanctioned accent-soft zone (mockup 682) */}
-        <div className="flex items-center gap-[9px] border-b border-[var(--border)] bg-[var(--accent-soft)] px-3.5 py-2 text-[12px] text-[var(--text-2)]">
+        {/* AI live-edit bar — sanctioned accent-soft zone (mockup 682), active AI-editing state */}
+        <div
+          data-live="ai-edit"
+          className="flex items-center gap-[9px] border-b border-[var(--border)] bg-[var(--accent-soft)] px-3.5 py-2 text-[12px] text-[var(--text-2)]"
+        >
           <LiveDot />
           <span>
             <b className="font-bold text-[var(--text)]">Wedevs AI</b> is editing{" "}
