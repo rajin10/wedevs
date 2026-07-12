@@ -3,7 +3,7 @@
 **Product:** Wedevs — a prosumer AI chat + code workspace (web + desktop).
 **This document:** a living, plain-language log of _what has actually been built_, _why each piece is necessary_, and _how the build deviated from the original plan_. It is the counterpart to the numbered docs (which describe the plan); this describes reality.
 **Last updated:** 2026-07-12.
-**Current state:** **Phase 0 (Foundations) — COMPLETE (10/10 tasks) and merge-approved.** All quality gates green; final whole-branch review passed with zero blocking issues. Next step is the GitHub repo + deployment setup (§7).
+**Current state:** **Phase 0 (Foundations), Phase 1 (Design system & shell), and Phase 2 (Auth & accounts) — COMPLETE.** The app is live at http://187.127.178.219 with the full design-system UI and, as of Phase 2, real session-based route protection + sign-out running in **demo-session mode** (flips to real Supabase auth the moment credentials are provided — see §Phase 2 below and `supabase/README.md`). All quality gates green throughout.
 
 > How to read this: the numbered docs (`README.md`, `01`–`04`) are the _plan_. This file is the _execution record_. When the two disagree, this file explains why — every deviation was deliberate and reviewed.
 
@@ -223,3 +223,24 @@ The repo and pipeline are live:
 ## 9. What's next
 
 **Phase 1** — the design system + Adaptive Canvas shell — turning `mockup/index.html` into real components. It will be authored as its own plan and executed the same task-by-task way, and will get its own section here as it lands.
+
+---
+
+## Phase 2 — Auth & accounts (COMPLETE, demo-mode live; real auth credential-gated)
+
+**Shipped (live now, demo-session mode):**
+
+- **One provider seam.** `apps/web/src/lib/auth/config.ts` `isSupabaseConfigured()` decides demo-vs-real. Every auth branch keys off it — never off env vars directly.
+- **Session layer.** `SessionUser` type; `getUser()`/`requireUser()` (server, provider-switched, `requireUser` redirects to `/login`); `SessionProvider`/`useSession()` (client) so the account chip has the right identity on first paint.
+- **Route protection.** `apps/web/src/middleware.ts` gates `/app/*` and bounces signed-in users off `/login` (edge, Buffer-free demo-cookie check; Supabase branch hardened with try/catch so an outage degrades gracefully instead of 500-ing). `apps/web/src/app/app/layout.tsx` calls `requireUser()` as the authoritative server-side gate (defense-in-depth vs middleware failing open).
+- **Auth endpoints.** `POST /api/auth/demo` (establish demo session), `POST /api/auth/signout` (clear session, demo + Supabase), `GET /auth/callback` (OAuth code exchange; demo fallback). The callback sanitizes its `?next=` param to same-origin only — an open-redirect and a follow-up dot-segment bypass were both found in review and closed, with tests for every attack vector.
+- **Wired UI.** `/login` establishes a demo session (or Supabase OTP/OAuth when configured); the LeftRail account chip is session-sourced; **Log out** actually clears the session and returns to `/login`; the Settings → Account pane shows the real account.
+
+**Dormant until credentials (built, inert without env):**
+
+- `apps/web/src/lib/auth/supabase/{server,client,middleware}.ts` — the `@supabase/ssr` clients.
+- `supabase/migrations/0001_profiles.sql` — `profiles` table + owner RLS + on-signup trigger.
+
+**The credential gate (what only the user can provide):** a free Supabase project → `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (+ `SUPABASE_SERVICE_ROLE_KEY`). Setting them (see `supabase/README.md`) switches the same UI to real Email-magic-link + Google + GitHub auth with **zero code changes**. This is the same pattern as the SSH deploy key — a credential only the account owner can place.
+
+**Execution:** subagent-driven-development, 8 tasks, fresh implementer + independent reviewer per task, TDD. Gates at every step: @wedevs/ui 293 tests, web 72 tests, full typecheck 7/7, `next build` green. The review loop caught and fixed a real open-redirect (and, on adversarial re-review, a bypass of the first fix) before anything shipped.
