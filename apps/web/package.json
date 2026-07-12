@@ -12,6 +12,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.2",
     "@t3-oss/env-nextjs": "^0.11.0",
     "@wedevs/shared": "workspace:*",
     "@wedevs/ui": "workspace:*",
