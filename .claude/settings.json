@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)"
+    ],
+    "deny": [
+      "Read(D:\\magic\\Talash\\**)",
+      "Edit(D:\\magic\\Talash\\**)",
+      "Write(D:\\magic\\Talash\\**)",
+      "Read(D:\\www\\Talash\\**)",
+      "Edit(D:\\www\\Talash\\**)",
+      "Write(D:\\www\\Talash\\**)",
+      "Read(C:\\Users\\Fahad\\Documents\\Projects\\Talash\\**)",
+      "Edit(C:\\Users\\Fahad\\Documents\\Projects\\Talash\\**)",
+      "Write(C:\\Users\\Fahad\\Documents\\Projects\\Talash\\**)",
+      "Read(D:\\magic\\my\\**)",
+      "Edit(D:\\magic\\my\\**)",
+      "Write(D:\\magic\\my\\**)",
+
+      "Edit(.github/workflows/**)",
+      "Write(.github/workflows/**)",
+      "Edit(eslint.config.js)",
+      "Write(eslint.config.js)",
+      "Edit(commitlint.config.js)",
+      "Write(commitlint.config.js)",
+      "Edit(.lintstagedrc.json)",
+      "Write(.lintstagedrc.json)",
+      "Edit(.husky/**)",
+      "Write(.husky/**)",
+      "Edit(.claude/settings.json)",
+      "Write(.claude/settings.json)",
+
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push*origin main*)",
+      "Bash(git push*origin*:main*)",
+      "Bash(rm -rf /*)",
+      "Bash(*D:\\magic\\Talash*)",
+      "Bash(*D:\\www\\Talash*)",
+      "Bash(*D:\\magic\\my*)"
+    ]
+  }
+}
