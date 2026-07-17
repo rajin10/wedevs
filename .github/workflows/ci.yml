@@ -13,6 +13,14 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
+
+      # Runs BEFORE lint, deliberately. Proves the placeholder rules still fire
+      # on known-bad input. A green lint means nothing if the rules silently
+      # stopped matching -- which is exactly how three gates in a repo we
+      # studied stayed dead for months while reporting success.
+      # If this fails: fix the RULE, never the fixture. See gate-fixtures/README.md
+      - run: pnpm verify:gates
+
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
